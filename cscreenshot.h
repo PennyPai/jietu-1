@@ -1,0 +1,5 @@
+#ifndef CSCREENSHOT
+#define CSCREENSHOT
+
+#endif // CSCREENSHOT
+
