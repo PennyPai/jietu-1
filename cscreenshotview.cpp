@@ -7,6 +7,7 @@
 #include "cscreenselectrectitem.h"
 #include "cscreeneditorwidget.h"
 #include "cscreeneditortoolbaritem.h"
+#include "cscreenrectitem.h"
 
 #include <QUuid>
 #include <QStandardPaths>
@@ -126,7 +127,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
     {
         m_startPoint = event->pos();
         m_selectRect = m_selectRectItem->rect();
-        bool isContains = m_selectRect.contains(getPoint(event->pos()));
+        bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
         if((isContains
                 && m_shotState == CSCREEN_SHOT_STATE_SELECTED)
                 || m_shotState == CSCREEN_SHOT_STATE_INITIALIZED)
@@ -174,7 +175,8 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
     //    m_selectRect = m_selectRectItem->rect();
     m_isPressed = false;
 
-    return QGraphicsView::mouseReleaseEvent(event);
+    QGraphicsView::mouseReleaseEvent(event);
+//    m_screen->update();
 }
 
 void CScreenShotView::mouseDoubleClickEvent(QMouseEvent *event)
@@ -194,9 +196,9 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
     {
         m_selectRectItem->setVisible(true);
         m_endPoint = event->pos();
-        QPointF startPoint = getPoint(m_startPoint);
-        QPointF endPoint = getPoint(event->pos());
-        QPointF maxPoint = getPoint(QPointF(this->geometry().width(),this->geometry().height()));
+        QPointF startPoint = getPointToSelectedItem(m_startPoint);
+        QPointF endPoint = getPointToSelectedItem(event->pos());
+        QPointF maxPoint = getPointToSelectedItem(QPointF(this->geometry().width(),this->geometry().height()));
         if(m_shotState == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             QRect rect = getPositiveRect(startPoint,endPoint);
@@ -233,20 +235,24 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         else if(m_shotState == CSCREEN_SHOT_STATE_EDITED && m_currentRectItem)
         {
             QRect rect = getPositiveRect(m_startPoint,event->pos());
-            m_currentRectItem->setRect(rect);
+            m_currentRectItem->setPainterRect(rect);
             m_currentRectItem->setVisible(true);
         }
     }
     return QGraphicsView::mouseMoveEvent(event);
 }
 
-QGraphicsRectItem *CScreenShotView::createRectItem()
+CScreenRectItem *CScreenShotView::createRectItem()
 {
-    QGraphicsRectItem *item = new QGraphicsRectItem;
-    QPen pen;
-    pen.setWidth(1);
-    pen.setColor(QColor(Qt::red));
-    item->setPen(pen);
+    QPointF topLeftPos = getPointFromSelectedItem(m_selectRect.topLeft());
+    QPointF bottomRightPos = getPointFromSelectedItem(m_selectRect.bottomRight());
+    QRect rect = getPositiveRect(topLeftPos,bottomRightPos);
+
+    CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
+//    QPen pen;
+//    pen.setWidth(1);
+//    pen.setColor(QColor(Qt::red));
+//    item->setPen(pen);
 //    item->setZValue(-1);
     return item;
 }
@@ -260,9 +266,14 @@ void CScreenShotView::drawPixmap(const QPixmap &pixmap)
     painter.fillRect(m_backgroundPixmap.rect(),QColor(0,0,0,90));
 }
 
-QPointF CScreenShotView::getPoint(const QPointF &point)
+QPointF CScreenShotView::getPointToSelectedItem(const QPointF &point)
 {
     return QPointF(point.x() / m_sx,point.y() / m_sy);
+}
+
+QPointF CScreenShotView::getPointFromSelectedItem(const QPointF &point)
+{
+    return QPointF(point.x() * m_sx,point.y() * m_sy);
 }
 
 QRect CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF &endPoint)

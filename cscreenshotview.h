@@ -11,6 +11,7 @@ class CScreenShotScene;
 class CScreenSelectRectItem;
 class CScreenEditorWidget;
 class CScreenEditorToolbarItem;
+class CScreenRectItem;
 
 class CScreenShotView : public QGraphicsView
 {
@@ -29,11 +30,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    QGraphicsRectItem *createRectItem();
+    CScreenRectItem *createRectItem();
 
 private:
     void drawPixmap(const QPixmap &pixmap);
-    QPointF getPoint(const QPointF &point);
+    QPointF getPointToSelectedItem(const QPointF &point);
+    QPointF getPointFromSelectedItem(const QPointF &point);
     QRect getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
 //    void getAdjustEndPoint(const QRectF &rect,const QPointF &startPoint,QPointF &endPoint);
     void updateToolbarPosition();
@@ -51,7 +53,7 @@ private:
     CScreenSelectRectItem *m_selectRectItem;
     QGraphicsProxyWidget *m_screenEditorWidgetItem;
     CScreenEditorToolbarItem *m_toolbarItem;
-    QGraphicsRectItem *m_currentRectItem;
+    CScreenRectItem *m_currentRectItem;
 
     QSharedPointer<CScreenEditorWidget> m_screenEditorWidget;
     CScreenShotState m_shotState;
