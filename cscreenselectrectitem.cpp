@@ -1,10 +1,10 @@
 #include <QPen>
 #include <QBrush>
 #include <QGraphicsSceneMouseEvent>
-#include "cscreenrectitem.h"
+#include "cscreenselectrectitem.h"
 #include <QDebug>
 
-CScreenRectItem::CScreenRectItem(const QPixmap &desktopPixmap, QGraphicsItem *parent)
+CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
     , m_topLeftEllipseItem(NULL)
     , m_bottomLeftEllipseItem(NULL)
@@ -28,13 +28,13 @@ CScreenRectItem::CScreenRectItem(const QPixmap &desktopPixmap, QGraphicsItem *pa
 //    this->setFlag(QGraphicsItem::ItemIsMovable,true);
 }
 
-void CScreenRectItem::setSelectedRect(const QRectF &rect)
+void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
 {
     this->setRect(rect);
     updateEllipseItems();
 }
 
-void CScreenRectItem::setScale(qreal scale)
+void CScreenSelectRectItem::setScale(qreal scale)
 {
     if(qAbs(scale) < 0.00000000001)
     {
@@ -50,32 +50,30 @@ void CScreenRectItem::setScale(qreal scale)
     QGraphicsRectItem::setScale(scale);
 }
 
-CScreenRectItem::~CScreenRectItem()
+CScreenSelectRectItem::~CScreenSelectRectItem()
 {
 
 }
 
-void CScreenRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void CScreenSelectRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug()<<Q_FUNC_INFO<<__LINE__;
-    event->ignore();
-    return;
     return QGraphicsRectItem::mousePressEvent(event);
 }
 
-void CScreenRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void CScreenSelectRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug()<<Q_FUNC_INFO<<__LINE__;
     return QGraphicsRectItem::mouseMoveEvent(event);
 }
 
-void CScreenRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void CScreenSelectRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug()<<Q_FUNC_INFO<<__LINE__;
     return QGraphicsRectItem::mouseReleaseEvent(event);
 }
 
-QGraphicsEllipseItem *CScreenRectItem::createEllipseItem(const QRectF &rect)
+QGraphicsEllipseItem *CScreenSelectRectItem::createEllipseItem(const QRectF &rect)
 {
     QGraphicsEllipseItem *item = new QGraphicsEllipseItem(this);
     item->setZValue(this->zValue() + 1);
@@ -88,7 +86,7 @@ QGraphicsEllipseItem *CScreenRectItem::createEllipseItem(const QRectF &rect)
     return item;
 }
 
-void CScreenRectItem::updateEllipseItems()
+void CScreenSelectRectItem::updateEllipseItems()
 {
     QRectF rect = this->rect();
     qDebug()<<Q_FUNC_INFO<<__LINE__<<"rect"<<rect<<"rect.bottomLeft()"<<rect.bottomLeft()<<rect.bottomRight();
@@ -122,7 +120,7 @@ void CScreenRectItem::updateEllipseItems()
     updateEllipseItem(&m_rightMiddleEllipseItem,rightMiddle);
 }
 
-void CScreenRectItem::updateEllipseItem(QGraphicsEllipseItem **item, const QRectF &rect)
+void CScreenSelectRectItem::updateEllipseItem(QGraphicsEllipseItem **item, const QRectF &rect)
 {
     if(((*item) == NULL))
     {

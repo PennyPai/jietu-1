@@ -18,17 +18,25 @@ SOURCES += main.cpp\
     cscreenshotscene.cpp \
     cscreenshotmanager.cpp \
     cscreenshot.cpp \
-    cscreenrectitem.cpp \
-    csreeneditorwidget.cpp
+    cscreeneditorwidget.cpp \
+    cscreeneditortoolbaritem.cpp \
+    cscreeneditorbuttonitem.cpp \
+    cscreenselectrectitem.cpp
 
 HEADERS  += dialog.h \
     cscreenshotview.h \
     cscreenshotscene.h \
     cscreenshotmanager.h \
     cscreenshot.h \
-    cscreenrectitem.h \
     cscreenpublic.h \
-    csreeneditorwidget.h
+    cscreeneditorwidget.h \
+    cscreeneditortoolbaritem.h \
+    cscreeneditorbuttonitem.h \
+    clogsetting.h \
+    cscreenselectrectitem.h
 
 FORMS    += dialog.ui \
-    csreeneditorwidget.ui
+    cscreeneditorwidget.ui
+
+RESOURCES += \
+    source.qrc

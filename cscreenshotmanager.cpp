@@ -2,14 +2,15 @@
 #include <QGuiApplication>
 #include "cscreenshotmanager.h"
 #include "cscreenshotview.h"
+#include "cscreeneditorwidget.h"
 #include <QDebug>
 #include <QWindowList>
 #include <QWindow>
 
 CScreenShotManager::CScreenShotManager(QObject *parent)
     :QObject(parent)
+    ,m_screenEditorWidget(new CScreenEditorWidget)
 {
-
 }
 
 CScreenShotManager::~CScreenShotManager()
@@ -29,7 +30,7 @@ void CScreenShotManager::startScreenShot()
         {
 //            continue;
         }
-        CScreenShotView *view = new CScreenShotView(d);
+        CScreenShotView *view = new CScreenShotView(m_screenEditorWidget,d);
         m_viewList.append(view);
         connect(view,SIGNAL(sigCancel()),
                 this,SLOT(onCancel()));
@@ -43,6 +44,11 @@ void CScreenShotManager::startScreenShot()
     foreach (QWindow *w, windowList) {
         qDebug()<<"w "<<w->geometry();
     }
+}
+
+QSharedPointer<CScreenEditorWidget> CScreenShotManager::getEditorWidget()
+{
+    return m_screenEditorWidget;
 }
 
 void CScreenShotManager::onCancel()

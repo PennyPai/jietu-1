@@ -1,15 +1,16 @@
-#ifndef _CSCREENRECTITEM_H_
-#define _CSCREENRECTITEM_H_
+#ifndef _CSCREENSELECTRECTITEM_H_
+#define _CSCREENSELECTRECTITEM_H_
 
 #include <QGraphicsRectItem>
+#include "clogsetting.h"
 
-class CScreenRectItem : public QGraphicsRectItem
+class CScreenSelectRectItem : public QGraphicsRectItem
 {
 public:
-    CScreenRectItem(const QPixmap &desktopPixmap,QGraphicsItem * parent = 0);
+    CScreenSelectRectItem(const QPixmap &desktopPixmap,QGraphicsItem * parent = 0);
     void setSelectedRect(const QRectF &rect);
     void setScale(qreal scale);
-    ~CScreenRectItem();
+    ~CScreenSelectRectItem();
 
 protected:
     //TODO ==START== 为后期选择移动准备
@@ -44,5 +45,5 @@ private:
     static const int m_penWidth = 2;
 };
 
-#endif // _CSCREENRECTITEM_H_
+#endif // _CSCREENSELECTRECTITEM_H_
 
