@@ -1,5 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
+#include "cscreenshotmanager.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -15,10 +16,11 @@ Dialog::~Dialog()
 
 void Dialog::on_pushButton_clicked()
 {
-    this->showMinimized();
+//    this->showMinimized();
+    CScreenShotManager::getInstance()->startScreenShot();
 }
 
 void Dialog::on_pushButton_2_clicked()
 {
-    this->showFullScreen();
+//    this->showFullScreen();
 }

@@ -1,5 +1,5 @@
-#ifndef CSCREENSHOTVIEW
-#define CSCREENSHOTVIEW
+#ifndef _CSCREENSHOTVIEW_H_
+#define _CSCREENSHOTVIEW_H_
 
 #include <QGraphicsView>
 
@@ -19,9 +19,11 @@ class CScreenShotView : public QGraphicsView
     LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
-    CScreenShotView(const QSharedPointer<CScreenEditorWidget> &screenEditorWidget,QScreen *screen,QWidget *parent = 0);
+    CScreenShotView(QScreen *screen,QWidget *parent = 0);
     ~CScreenShotView();
     void startSCreenShot();
+    void setLocked(bool locked);
+    QPixmap getPixmap();
 
 protected:
     bool event(QEvent *event);
@@ -39,27 +41,29 @@ private:
     QRect getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
 //    void getAdjustEndPoint(const QRectF &rect,const QPointF &startPoint,QPointF &endPoint);
     void updateToolbarPosition();
-
+    void setShotStatus(CScreenShotStatus status);
+    QPixmap createPixmap();
 
 private slots:
     void onButtonClicked(CScreenButtonType type);
 
 signals:
-    void sigCancel();
+    void sigStatusChanged(CScreenShotStatus status);
 
 private:
+    QScreen *m_desktopScreen;
     CScreenShotScene *m_screen;
     QGraphicsPixmapItem *m_backgroundItem;
     CScreenSelectRectItem *m_selectRectItem;
-    QGraphicsProxyWidget *m_screenEditorWidgetItem;
     CScreenEditorToolbarItem *m_toolbarItem;
     CScreenRectItem *m_currentRectItem;
 
-    QSharedPointer<CScreenEditorWidget> m_screenEditorWidget;
-    CScreenShotState m_shotState;
     CScreenPositionType m_positionType;
+    CScreenShotStatus m_shotStatus;
+    Qt::WindowFlags m_flags;
     //====
     bool m_isPressed;
+    bool m_isLocked;
     QPoint m_startPoint;
     QPoint m_endPoint;
     QPixmap m_backgroundPixmap;
@@ -67,9 +71,10 @@ private:
     qreal m_sx;
     qreal m_sy;
     QRectF m_selectRect;
+    QPixmap m_pixmap;
 //    QList<QGraphicsRectItem*> m_editorItemList;
     static const int m_marginSelectedWidthToolbar = 4;
 };
 
-#endif // CSCREENSHOTVIEW
+#endif // _CSCREENSHOTVIEW_H_
 

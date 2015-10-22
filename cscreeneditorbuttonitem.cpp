@@ -26,13 +26,8 @@ QRectF CScreenEditorButtonItem::boundingRect() const
 
 void CScreenEditorButtonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-//    QPen pen(Qt::NoPen);
-    QPen pen;
-    QColor color(Qt::red);
-    pen.setColor(color);
+    QPen pen(Qt::NoPen);
     painter->setPen(pen);
-//    painter->drawRect(m_rect);
-    painter->drawRect(QRect(0,0,111,666));
     if(m_isPressed)
     {
         painter->drawImage(m_rect,QImage(":/screenshot/res/screenshot/buttonpressedbg.png"));

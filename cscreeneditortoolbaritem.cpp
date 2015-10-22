@@ -55,10 +55,6 @@ QRectF CScreenEditorToolbarItem::boundingRect() const
 
 void CScreenEditorToolbarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPen pen(Qt::NoPen);
-//    pen.setColor(QColor("#12ac44"));
-    painter->setPen(pen);
-    painter->drawRect(m_rect);
     painter->drawImage(m_rect,QImage(":/screenshot/res/screenshot/toolbarbg.png"));
 }
 
@@ -95,8 +91,6 @@ void CScreenEditorToolbarItem::onButtonClicked()
     {
         m_currentButtonType = CSCREEN_BUTTON_TYPE_OK;
     }
-    emit sigButtonClicked(m_currentButtonType);
-    LOG_TEST(QString("onButtonClicked"));
 
     if(buttomItem != m_rectButtonItem)
     {
@@ -110,4 +104,6 @@ void CScreenEditorToolbarItem::onButtonClicked()
     {
         m_okButtonItem->clearSelected();
     }
+    emit sigButtonClicked(m_currentButtonType);
+    LOG_TEST(QString("onButtonClicked"));
 }

@@ -1,12 +1,12 @@
-#ifndef CSCREENSHOTMANAGER
-#define CSCREENSHOTMANAGER
+#ifndef _CSCREENSHOTMANAGER_H_
+#define _CSCREENSHOTMANAGER_H_
 
 #include <QObject>
 #include <QSharedPointer>
+#include "cscreenpublic.h"
 #include "clogsetting.h"
 
 class CScreenShotView;
-class CScreenEditorWidget;
 
 class CScreenShotManager : public QObject
 {
@@ -14,18 +14,24 @@ class CScreenShotManager : public QObject
     LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
-    explicit CScreenShotManager(QObject *parent=0);
+    static CScreenShotManager *getInstance();
     ~CScreenShotManager();
     void startScreenShot();
-    QSharedPointer<CScreenEditorWidget> getEditorWidget();
+    void clearAll();
+
+protected:
+    explicit CScreenShotManager(QObject *parent=0);
 
 private slots:
-    void onCancel();
+    void onStatusChanged(CScreenShotStatus status);
+
+signals:
+    void sigScreenShotPixmapChanged(const QPixmap &pixmap);
 
 private:
+    static CScreenShotManager *m_instance;
     QList<CScreenShotView *> m_viewList;
-    QSharedPointer<CScreenEditorWidget> m_screenEditorWidget;
 };
 
-#endif // CSCREENSHOTMANAGER
+#endif // _CSCREENSHOTMANAGER_H_
 

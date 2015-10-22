@@ -1,5 +1,5 @@
-#ifndef CSCREENSHOTSCENE
-#define CSCREENSHOTSCENE
+#ifndef _CSCREENSHOTSCENE_H_
+#define _CSCREENSHOTSCENE_H_
 
 #include <QGraphicsScene>
 #include "clogsetting.h"
@@ -14,5 +14,5 @@ public:
     ~CScreenShotScene();
 };
 
-#endif // CSCREENSHOTSCENE
+#endif // _CSCREENSHOTSCENE_H_
 
