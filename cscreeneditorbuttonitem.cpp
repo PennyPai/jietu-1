@@ -60,7 +60,9 @@ void CScreenEditorButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if(event->button() == Qt::LeftButton)
     {
         m_isPressed = true;
+        event->accept();
         emit sigClicked();
+        return;
     }
     else
     {

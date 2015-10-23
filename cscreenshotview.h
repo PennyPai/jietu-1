@@ -46,6 +46,7 @@ private:
 
 private slots:
     void onButtonClicked(CScreenButtonType type);
+    void onFinishTimerOut();
 
 signals:
     void sigStatusChanged(CScreenShotStatus status);

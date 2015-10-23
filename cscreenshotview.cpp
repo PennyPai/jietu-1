@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QGraphicsProxyWidget>
 #include <QClipboard>
+#include <QTimer>
 #include "cscreenshotview.h"
 #include "cscreenshotscene.h"
 #include "cscreenselectrectitem.h"
@@ -75,6 +76,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     connect(m_toolbarItem,SIGNAL(sigButtonClicked(CScreenButtonType)),
             this,SLOT(onButtonClicked(CScreenButtonType)));
     m_toolbarItem->setVisible(false);
+    m_toolbarItem->setZValue(m_selectRectItem->zValue() + 1);
     m_screen->addItem(m_toolbarItem);
 
 }
@@ -125,8 +127,7 @@ QPixmap CScreenShotView::createPixmap()
         QRect rect = getPositiveRect(startPos,endPos);
      //        QApplication::screens()
 //        pixmap = QPixmap::grabWidget(this,rect);
-
-        QDesktopWidget * pDesktoWidget = QApplication::desktop();
+        QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
         LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
                  .arg(geometry.x())
@@ -183,6 +184,12 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
         LOG_TEST(QString("x %1,posX %2, xx%3").arg(this->geometry().x())
                  .arg(event->pos().x())
                  .arg(this->mapFromGlobal(event->pos()).x()));
+        QRectF toolBarItemRect(m_toolbarItem->pos(),m_toolbarItem->boundingRect().size());
+        if(m_toolbarItem->isVisible() && toolBarItemRect.contains(event->pos()))
+        {
+            return QGraphicsView::mousePressEvent(event);
+            return ;
+        }
         m_startPoint = event->pos();
         m_selectRect = m_selectRectItem->getSelectRect();
         bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
@@ -226,12 +233,11 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
 
     if(m_isPressed)
     {
-//        qDebug()<<"mouseReleaseEvent2";
+        QRectF selectRect = m_selectRectItem->getSelectRect();
+        qreal minSelectSize = m_minSelectSize / m_sx;
+        bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
-            QRectF selectRect = m_selectRectItem->getSelectRect();
-            qreal minSelectSize = m_minSelectSize / m_sx;
-            bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
             updateToolbarPosition();
             if(visible)
             {
@@ -245,11 +251,15 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             m_selectRectItem->setVisible(visible);
             m_toolbarItem->setVisible(visible);
         }
+        else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
+        {
+            updateToolbarPosition();
+            m_toolbarItem->setVisible(visible);
+        }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
         {
             m_currentRectItem = NULL;
         }
-
     }
 
     //    m_selectRect = m_selectRectItem->getSelectRect();
@@ -387,8 +397,24 @@ QRect CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF 
 
 void CScreenShotView::updateToolbarPosition()
 {
-    qreal x = m_selectRectItem->getSelectRect().left() * m_sx;
-    qreal y = m_selectRectItem->getSelectRect().bottom() * m_sx + m_marginSelectedWidthToolbar;
+    if(m_desktopScreen == NULL)
+    {
+        return;
+    }
+    QPointF topLeftPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().topLeft());
+    QPointF bottomRightPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().bottomRight());
+    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+    qreal x = rect.right() - m_toolbarItem->boundingRect().width();
+    if( x < 0)
+    {
+        x = 0;
+    }
+    qreal y = rect.bottom() + m_marginSelectedWidthToolbar
+            + m_selectRectItem->pen().width() * m_sx;
+    if(y + m_toolbarItem->boundingRect().height() > this->height())
+    {
+        y = rect.bottom() - m_marginSelectedWidthToolbar - m_toolbarItem->boundingRect().height();
+    }
     m_toolbarItem->setPos(x,y);
 }
 
@@ -415,12 +441,11 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
     case CSCREEN_BUTTON_TYPE_OK:
         if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
         {
-            m_pixmap = createPixmap();
-            QClipboard *clipboard = QApplication::clipboard();
-            clipboard->setPixmap(m_pixmap);
+            m_toolbarItem->setVisible(false);
+            //延迟获取图片，否则工具栏可能不消失
+            QTimer::singleShot(50, this, SLOT(onFinishTimerOut()));
         }
         LOG_TEST(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
-        setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
         break;
     case CSCREEN_BUTTON_TYPE_CANCLE:
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
@@ -428,5 +453,13 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
     default:
         break;
     }
+}
+
+void CScreenShotView::onFinishTimerOut()
+{
+    m_pixmap = createPixmap();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setPixmap(m_pixmap);
+    setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
 }
 
