@@ -14,14 +14,16 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
     , m_bottomRightEllipseItem(NULL)
     , m_leftMiddleEllipseItem(NULL)
     , m_rightMiddleEllipseItem(NULL)
+//    , m_borderItem(NULL)
     , m_desktopPixmap(desktopPixmap)
     , m_penColor(QColor("#00ACFF"))
 {
     QBrush brush(m_desktopPixmap);
     this->setBrush(brush);
 
-    m_penColor.setAlpha(128);
+//    m_penColor.setAlpha(128);
     QPen pen(m_penColor);
+//    QPen pen(Qt::NoPen);
     pen.setWidth(m_penWidth);
     this->setPen(pen);
     this->setAcceptedMouseButtons(Qt::LeftButton);
@@ -30,7 +32,14 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
 
 void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
 {
-    this->setRect(rect);
+    m_rect = rect;
+    qreal penWidth = this->pen().width() * 0.5;
+    QRect adjustRect(m_rect.x() - penWidth,
+                     m_rect.y() - penWidth,
+                     m_rect.width() + 2 * penWidth,
+                     m_rect.height() + 2 * penWidth);
+    QGraphicsRectItem::setRect(adjustRect);
+//    QGraphicsRectItem::setRect(m_rect);
     updateEllipseItems();
 }
 
@@ -44,15 +53,22 @@ void CScreenSelectRectItem::setScale(qreal scale)
     {
         return;
     }
+//    QPen pen(Qt::NoPen);
     QPen pen(m_penColor);
     pen.setWidth(m_penWidth / scale);
     this->setPen(pen);
     QGraphicsRectItem::setScale(scale);
+    setSelectedRect(m_rect);
 }
 
 CScreenSelectRectItem::~CScreenSelectRectItem()
 {
 
+}
+
+QRectF CScreenSelectRectItem::getSelectRect() const
+{
+    return m_rect;
 }
 
 void CScreenSelectRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -78,9 +94,12 @@ QGraphicsEllipseItem *CScreenSelectRectItem::createEllipseItem(const QRectF &rec
     QGraphicsEllipseItem *item = new QGraphicsEllipseItem(this);
     item->setZValue(this->zValue() + 1);
     item->setRect(rect);
-    QPen pen(Qt::red);
+    QColor color(Qt::white);
+    QPen pen(color);
     pen.setWidth(1);
     item->setPen(pen);
+    QBrush brush(color);
+    item->setBrush(brush);
     //TODO
     item->setVisible(false);
     return item;
@@ -88,16 +107,20 @@ QGraphicsEllipseItem *CScreenSelectRectItem::createEllipseItem(const QRectF &rec
 
 void CScreenSelectRectItem::updateEllipseItems()
 {
-    QRectF rect = this->rect();
-    qDebug()<<Q_FUNC_INFO<<__LINE__<<"rect"<<rect<<"rect.bottomLeft()"<<rect.bottomLeft()<<rect.bottomRight();
     qreal radius = m_ellipseRadius / this->scale();
     qreal diameter = 2 * radius;
-    qreal leftPosX = rect.left() - radius;
-    qreal rightPosX = rect.right() - radius;
-    qreal hMiddlePosX = rect.center().x() - radius;
-    qreal topPosY = rect.top() - radius;
-    qreal bottomPosY = rect.bottom() - radius;
-    qreal vMiddlePosY = rect.center().y() - radius;
+    qreal penWidth = this->pen().width();
+    QRect adjustRect(m_rect.x() - penWidth,
+                     m_rect.y() - penWidth,
+                     m_rect.width() + 2 * penWidth,
+                     m_rect.height() + 2 * penWidth);
+
+    qreal leftPosX = adjustRect.left() - radius;
+    qreal rightPosX = adjustRect.right() - radius;
+    qreal hMiddlePosX = adjustRect.center().x() - radius;
+    qreal topPosY = adjustRect.top() - radius;
+    qreal bottomPosY = adjustRect.bottom() - radius;
+    qreal vMiddlePosY = adjustRect.center().y() - radius;
 
     QRectF topLeft = QRectF(leftPosX,topPosY,diameter,diameter);
     QRectF leftMiddle = QRectF(leftPosX,vMiddlePosY,diameter,diameter);

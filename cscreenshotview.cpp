@@ -29,10 +29,11 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     ,m_isPressed(false)
     ,m_isLocked(false)
 {
-   m_flags = this->windowFlags();
-   this->setWindowModality(Qt::WindowModal);
+//   m_flags = this->windowFlags();
+//    setWindowFlags(Qt::FramelessWindowHint);
+//    setWindowModality(Qt::WindowModal);
+//    this->setWindowFlags(this->windowFlags() | Qt::Tool);
     //======
-//    this->overrideWindowFlags(Qt::ToolTip );
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
     QDesktopWidget * pDesktoWidget = QApplication::desktop();
@@ -47,12 +48,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
                                         ,geometry.y(),geometry.width(),geometry.height());
 
     drawPixmap(pixmap);
-    //    m_pixmap = pixmap;
-//    QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
-//            .append(QString("/%1.png").arg(QUuid::createUuid().toString()));
-    //    pixmap.save(fileName);
-//    qDebug()<<fileName<<geometry<<pixmap.size();
-    m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
+       m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
     this->setGeometry(geometry);
 //    qDebug()<<"transform"<<this->transform();
@@ -99,6 +95,10 @@ void CScreenShotView::startSCreenShot()
     this->overrideWindowFlags(Qt::ToolTip);
     this->showFullScreen();
     this->overrideWindowFlags(Qt::Sheet | Qt::Window );
+
+//    showFullScreen();
+//    resize(m_desktopScreen->geometry().size());
+//    move(m_desktopScreen->geometry().x(),m_desktopScreen->geometry().y());
 }
 
 void CScreenShotView::setLocked(bool locked)
@@ -120,12 +120,10 @@ QPixmap CScreenShotView::createPixmap()
     QPixmap pixmap;
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
-        QPointF startPos = /*getPointFromSelectedItem*/(m_selectRectItem->rect().topLeft());
-        QPointF endPos = /*getPointFromSelectedItem*/(m_selectRectItem->rect().bottomRight());
+        QPointF startPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().topLeft());
+        QPointF endPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().bottomRight());
         QRect rect = getPositiveRect(startPos,endPos);
-        QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
-                .append(QString("/%1.png").arg(QUuid::createUuid().toString()));
-//        QApplication::screens()
+     //        QApplication::screens()
 //        pixmap = QPixmap::grabWidget(this,rect);
 
         QDesktopWidget * pDesktoWidget = QApplication::desktop();
@@ -142,7 +140,8 @@ QPixmap CScreenShotView::createPixmap()
 //        QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId());
         pixmap = desktopPixmap.copy(rect);
 //        pixmap = desktopPixmap.opy(QRect(m_startPoint.x(),m_startPoint.y(),110,110));
-
+        QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
+                .append(QString("/shotscreenimages/%1.png").arg(QUuid::createUuid().toString()));
         pixmap.save(fileName);
     }
     return pixmap;
@@ -181,9 +180,11 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
     }
     if(event->button() == Qt::LeftButton)
     {
-        LOG_TEST(QString("x %1,posX %2").arg(this->geometry().x()).arg(event->pos().x()));
+        LOG_TEST(QString("x %1,posX %2, xx%3").arg(this->geometry().x())
+                 .arg(event->pos().x())
+                 .arg(this->mapFromGlobal(event->pos()).x()));
         m_startPoint = event->pos();
-        m_selectRect = m_selectRectItem->rect();
+        m_selectRect = m_selectRectItem->getSelectRect();
         bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
         if((isContains
                 && m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
@@ -228,14 +229,30 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
 //        qDebug()<<"mouseReleaseEvent2";
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
-            setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
+            QRectF selectRect = m_selectRectItem->getSelectRect();
+            qreal minSelectSize = m_minSelectSize / m_sx;
+            bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
+            updateToolbarPosition();
+            if(visible)
+            {
+                m_selectRect = selectRect;
+                setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
+            }
+            else
+            {
+                m_selectRectItem->setRect(QRectF(0,0,0,0));
+            }
+            m_selectRectItem->setVisible(visible);
+            m_toolbarItem->setVisible(visible);
         }
-        m_selectRect = m_selectRectItem->rect();
-        m_toolbarItem->setVisible(true);
-        updateToolbarPosition();
+        else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
+        {
+            m_currentRectItem = NULL;
+        }
+
     }
 
-    //    m_selectRect = m_selectRectItem->rect();
+    //    m_selectRect = m_selectRectItem->getSelectRect();
     m_isPressed = false;
 
     QGraphicsView::mouseReleaseEvent(event);
@@ -249,12 +266,6 @@ void CScreenShotView::mouseDoubleClickEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-    //    QRect rect = getPositiveRect(m_startPoint,m_endPoint);
-//    QRect rect = getPositiveRect(m_selectRectItem->rect().topLeft(),m_endPoint);
-//    QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
-//            .append(QString("/%1.png").arg(QUuid::createUuid().toString()));
-//    //    pixmap.save(fileName);
-//    QPixmap::grabWidget(this,rect).save(fileName);
     return QGraphicsView::mouseDoubleClickEvent(event);
 }
 
@@ -376,8 +387,8 @@ QRect CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF 
 
 void CScreenShotView::updateToolbarPosition()
 {
-    qreal x = m_selectRectItem->rect().left() * m_sx;
-    qreal y = m_selectRectItem->rect().bottom() * m_sx + m_marginSelectedWidthToolbar;
+    qreal x = m_selectRectItem->getSelectRect().left() * m_sx;
+    qreal y = m_selectRectItem->getSelectRect().bottom() * m_sx + m_marginSelectedWidthToolbar;
     m_toolbarItem->setPos(x,y);
 }
 

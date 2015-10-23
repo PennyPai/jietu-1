@@ -45,12 +45,20 @@ void CScreenShotManager::startScreenShot()
                 this,SLOT(onStatusChanged(CScreenShotStatus)));
         view->startSCreenShot();
 //        view->show();
+        view->raise();
+
     }
 }
 
 void CScreenShotManager::clearAll()
 {
-    qDeleteAll(m_viewList);
+    //可能为导致crash
+    //qDeleteAll(m_viewList);
+    foreach (QGraphicsView *v, m_viewList)
+    {
+       v->setVisible(false);
+       v->deleteLater();
+    }
     m_viewList.clear();
 }
 
@@ -68,11 +76,27 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         pixmap = view->getPixmap();
     }
 
+    CScreenShotView *firstView = NULL;
     foreach (CScreenShotView *d, m_viewList)
     {
         if(status == CSCREEN_SHOT_STATE_CANCEL || status == CSCREEN_SHOT_STATE_FINISHED)
         {
-            d->setHidden(true);
+            if(firstView != NULL)
+            {
+                //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
+                //方式1
+//                d->setWindowOpacity(0.01);
+//                d->showMinimized();
+                //方式2
+                d->setVisible(false);
+                d->setWindowState((d->windowState() & ~Qt::WindowActive) | Qt::WindowMinimized);
+                //END=======================
+                d->deleteLater();
+            }
+            else
+            {
+                firstView = d;
+            }
         }
         else
         {
@@ -82,13 +106,20 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             }
         }
     }
-    if(status == CSCREEN_SHOT_STATE_FINISHED)
+
+    if(status == CSCREEN_SHOT_STATE_CANCEL || status == CSCREEN_SHOT_STATE_FINISHED)
     {
-        emit sigScreenShotPixmapChanged(pixmap);
-//        clearAll();
-    }
-    else if(status == CSCREEN_SHOT_STATE_CANCEL)
-    {
-//        clearAll();
+        if(firstView)
+        {
+             //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
+            firstView->setWindowOpacity(0.01);
+            firstView->showMinimized();
+            firstView->deleteLater();
+        }
+        m_viewList.clear();
+        if(status == CSCREEN_SHOT_STATE_FINISHED)
+        {
+            emit sigScreenShotPixmapChanged(pixmap);
+        }
     }
 }

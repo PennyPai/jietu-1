@@ -11,6 +11,7 @@ public:
     void setSelectedRect(const QRectF &rect);
     void setScale(qreal scale);
     ~CScreenSelectRectItem();
+    QRectF getSelectRect() const;
 
 protected:
     //TODO ==START== 为后期选择移动准备
@@ -37,12 +38,14 @@ private:
     QGraphicsEllipseItem *m_leftMiddleEllipseItem;
     QGraphicsEllipseItem *m_rightMiddleEllipseItem;
     //TODO ==END== 为后期选择移动准备
+//    QGraphicsRectItem *m_borderItem;
     QPixmap m_desktopPixmap;
     QColor m_penColor;
-    static const int m_ellipseRadius = 3;
+    QRectF m_rect;
+    static const int m_ellipseRadius = 5;
     static const int m_ellipseLineWidth = 1;
     static const int m_ellipseOffset = 3;
-    static const int m_penWidth = 2;
+    static const int m_penWidth = 4;
 };
 
 #endif // _CSCREENSELECTRECTITEM_H_

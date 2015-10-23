@@ -74,6 +74,7 @@ private:
     QPixmap m_pixmap;
 //    QList<QGraphicsRectItem*> m_editorItemList;
     static const int m_marginSelectedWidthToolbar = 4;
+    static const int m_minSelectSize = 1;
 };
 
 #endif // _CSCREENSHOTVIEW_H_
