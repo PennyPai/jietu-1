@@ -9,6 +9,7 @@
 #include "cscreenselectrectitem.h"
 #include "cscreeneditortoolbaritem.h"
 #include "cscreenrectitem.h"
+#include "cscreentooltipitem.h"
 
 #include <QUuid>
 #include <QStandardPaths>
@@ -25,6 +26,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     ,m_selectRectItem(NULL)
     ,m_toolbarItem(NULL)
     ,m_currentRectItem(NULL)
+    ,m_tooltipSizeItem(NULL)
     ,m_positionType(CSCREEN_POSITION_TYPE_NOT_CONTAIN)
     ,m_shotStatus(CSCREEN_SHOT_STATE_INITIALIZED)
     ,m_isPressed(false)
@@ -78,7 +80,9 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     m_toolbarItem->setVisible(false);
     m_toolbarItem->setZValue(m_selectRectItem->zValue() + 1);
     m_screen->addItem(m_toolbarItem);
-
+    m_tooltipSizeItem = new CScreenTooltipItem;
+    m_tooltipSizeItem->setVisible(false);
+    m_screen->addItem(m_tooltipSizeItem);
 }
 
 CScreenShotView::~CScreenShotView()
@@ -125,8 +129,6 @@ QPixmap CScreenShotView::createPixmap()
         QPointF startPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().topLeft());
         QPointF endPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().bottomRight());
         QRect rect = getPositiveRect(startPos,endPos);
-     //        QApplication::screens()
-//        pixmap = QPixmap::grabWidget(this,rect);
         QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
         LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
@@ -138,9 +140,7 @@ QPixmap CScreenShotView::createPixmap()
         QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                             ,geometry.y(),geometry.width(),geometry.height());
 
-//        QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId());
         pixmap = desktopPixmap.copy(rect);
-//        pixmap = desktopPixmap.opy(QRect(m_startPoint.x(),m_startPoint.y(),110,110));
         QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
                 .append(QString("/shotscreenimages/%1.png").arg(QUuid::createUuid().toString()));
         pixmap.save(fileName);
@@ -148,9 +148,13 @@ QPixmap CScreenShotView::createPixmap()
     return pixmap;
 }
 
+QString CScreenShotView::getSizeString(const QSize &size) const
+{
+    return QString("%1 * %2").arg(size.width()).arg(size.height());
+}
+
 bool CScreenShotView::event(QEvent *event)
 {
-    //    qDebug()<<"TTTTT"<<event->type();
     return QGraphicsView::event(event);
 }
 
@@ -246,7 +250,7 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             }
             else
             {
-                m_selectRectItem->setRect(QRectF(0,0,0,0));
+                m_selectRectItem->setSelectedRect(QRectF(0,0,0,0));
             }
             m_selectRectItem->setVisible(visible);
             m_toolbarItem->setVisible(visible);
@@ -295,8 +299,29 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         QPointF maxPoint = getPointToSelectedItem(QPointF(this->geometry().width(),this->geometry().height()));
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
+            if(endPoint.x() > maxPoint.x())
+            {
+                endPoint.setX(maxPoint.x());
+            }
+            if(endPoint.y() > maxPoint.y())
+            {
+                endPoint.setY(maxPoint.y());
+            }
+            if(endPoint.x() < 0)
+            {
+                endPoint.setX(0);
+            }
+            if(endPoint.y() < 0)
+            {
+                endPoint.setY(0);
+            }
+
             QRect rect = getPositiveRect(startPoint,endPoint);
-            m_selectRectItem->setSelectedRect(rect);
+            if(rect.width() > m_minSelectSize && rect.height() > m_minSelectSize)
+            {
+                m_selectRectItem->setSelectedRect(rect);
+                updateTooltipItem();
+            }
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
@@ -325,6 +350,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             }
             QRectF rect(x,y,m_selectRect.width(),m_selectRect.height());
             m_selectRectItem->setSelectedRect(rect);
+            updateTooltipItem();
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED && m_currentRectItem)
         {
@@ -343,7 +369,8 @@ CScreenRectItem *CScreenShotView::createRectItem()
     QRect rect = getPositiveRect(topLeftPos,bottomRightPos);
 
     CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
-//    QPen pen;
+//    QUrl
+//    QPen pen;QUrl
 //    pen.setWidth(1);
 //    pen.setColor(QColor(Qt::red));
 //    item->setPen(pen);
@@ -418,6 +445,29 @@ void CScreenShotView::updateToolbarPosition()
     m_toolbarItem->setPos(x,y);
 }
 
+void CScreenShotView::updateTooltipItem()
+{
+    if(m_desktopScreen == NULL)
+    {
+        return;
+    }
+    QPointF topLeftPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().topLeft());
+    QPointF bottomRightPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().bottomRight());
+    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+    m_tooltipSizeItem->setText(getSizeString(rect.size().toSize()));
+//    m_tooltipSizeItem->setText("FADFASDFDSF");
+    qreal x = rect.left();
+    qreal y = rect.top() - m_tooltipSizeItem->boundingRect().height()
+            - m_selectRectItem->pen().width() * m_sx
+            - m_marginSelectedWidthTooltip;
+    if(y < 0)
+    {
+        y = 0;
+    }
+    m_tooltipSizeItem->setPos(x,y);
+    m_tooltipSizeItem->setVisible(true);
+}
+
 void CScreenShotView::setShotStatus(CScreenShotStatus status)
 {
     if(m_shotStatus != status)
@@ -442,8 +492,9 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
         if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
         {
             m_toolbarItem->setVisible(false);
+            m_tooltipSizeItem->setVisible(false);
             //延迟获取图片，否则工具栏可能不消失
-            QTimer::singleShot(50, this, SLOT(onFinishTimerOut()));
+            QTimer::singleShot(10, this, SLOT(onFinishTimerOut()));
         }
         LOG_TEST(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
         break;

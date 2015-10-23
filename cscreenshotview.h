@@ -12,6 +12,7 @@ class CScreenSelectRectItem;
 class CScreenEditorWidget;
 class CScreenEditorToolbarItem;
 class CScreenRectItem;
+class CScreenTooltipItem;
 
 class CScreenShotView : public QGraphicsView
 {
@@ -41,8 +42,10 @@ private:
     QRect getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
 //    void getAdjustEndPoint(const QRectF &rect,const QPointF &startPoint,QPointF &endPoint);
     void updateToolbarPosition();
+    void updateTooltipItem();
     void setShotStatus(CScreenShotStatus status);
     QPixmap createPixmap();
+    QString getSizeString(const QSize &size) const;
 
 private slots:
     void onButtonClicked(CScreenButtonType type);
@@ -58,6 +61,7 @@ private:
     CScreenSelectRectItem *m_selectRectItem;
     CScreenEditorToolbarItem *m_toolbarItem;
     CScreenRectItem *m_currentRectItem;
+    CScreenTooltipItem *m_tooltipSizeItem;
 
     CScreenPositionType m_positionType;
     CScreenShotStatus m_shotStatus;
@@ -75,6 +79,7 @@ private:
     QPixmap m_pixmap;
 //    QList<QGraphicsRectItem*> m_editorItemList;
     static const int m_marginSelectedWidthToolbar = 4;
+    static const int m_marginSelectedWidthTooltip = 4;
     static const int m_minSelectSize = 1;
 };
 
