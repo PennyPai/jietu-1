@@ -569,7 +569,7 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
     {//draw text
         QRgb pointRgb = getPixmapPosRgb(m_desktopPixmap,toItemPos.toPoint());
         QFont font;
-        font.setPointSize(m_previewPointSize);
+        font.setPixelSize(m_previewPointSize);
         painter.setFont(font);
         QColor textColor("#B8B8B8");
         QPen pen(textColor);
