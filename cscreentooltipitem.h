@@ -1,5 +1,5 @@
-#ifndef CSCREENTOOLTIPITEM_H
-#define CSCREENTOOLTIPITEM_H
+#ifndef _CSCREENTOOLTIPITEM_H_
+#define _CSCREENTOOLTIPITEM_H_
 
 #include <QGraphicsObject>
 #include "clogsetting.h"
@@ -25,4 +25,4 @@ private:
     static const int m_rectRadius = 3;
 };
 
-#endif // CSCREENTOOLTIPITEM_H
+#endif // _CSCREENTOOLTIPITEM_H_

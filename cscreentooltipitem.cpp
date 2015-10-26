@@ -27,6 +27,7 @@ QRectF CScreenTooltipItem::boundingRect() const
 
 void CScreenTooltipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    painter->save();
     {
         QPen pen;
         pen.setColor(m_colorBackgroud);
@@ -40,11 +41,11 @@ void CScreenTooltipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         pen.setColor(m_colorText);
         painter->setPen(pen);
         QFont font;
-//        font.setPixelSize(m_textPointSize);
         font.setPointSize(m_textPointSize);
         painter->setFont(font);
         painter->drawText(m_rect,Qt::AlignCenter, m_text);
     }
+    painter->restore();
 }
 
 void CScreenTooltipItem::setText(const QString &text)

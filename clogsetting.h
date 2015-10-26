@@ -1,5 +1,5 @@
-#ifndef CLOGSETTING_H
-#define CLOGSETTING_H
+#ifndef _CLOGSETTING_H_
+#define _CLOGSETTING_H_
 #include <QDebug>
 
 #define LOG4QT_DECLARE_QCLASS_LOGGER
@@ -22,5 +22,5 @@
 #define LOG_ERROR_ROOT(errorLog) qCritical() << LOG_HEAD << errorLog;
 
 
-#endif // CLOGSETTING_H
+#endif // _CLOGSETTING_H_
 

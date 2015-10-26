@@ -56,7 +56,6 @@ void CScreenEditorButtonItem::clearSelected()
 
 void CScreenEditorButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__<<"mousePressEvent";
     if(event->button() == Qt::LeftButton)
     {
         m_isPressed = true;
@@ -74,7 +73,7 @@ void CScreenEditorButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CScreenEditorButtonItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__<<"mouseReleaseEvent";
+    LOG_TEST(QString("mouseReleaseEvent"));
     QGraphicsObject::mouseReleaseEvent(event);
 }
 
@@ -94,6 +93,6 @@ void CScreenEditorButtonItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void CScreenEditorButtonItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__<<"mouseDoubleClickEvent";
+    LOG_TEST(QString("mouseDoubleClickEvent"));
     return QGraphicsObject::mouseDoubleClickEvent(event);
 }

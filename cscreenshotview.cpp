@@ -36,7 +36,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
 {
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
-    QDesktopWidget * pDesktoWidget = QApplication::desktop();
+    QDesktopWidget *pDesktoWidget = QApplication::desktop();
     QRect geometry= screen->geometry();
 //    QRect geometry= screen->availableVirtualGeometry();
     LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
@@ -131,8 +131,8 @@ QPixmap CScreenShotView::createPixmap()
     QPixmap pixmap;
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
-        QPointF startPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().topLeft());
-        QPointF endPos = /*getPointFromSelectedItem*/(m_selectRectItem->getSelectRect().bottomRight());
+        QPointF startPos = m_selectRectItem->getSelectRect().topLeft();
+        QPointF endPos = m_selectRectItem->getSelectRect().bottomRight();
         QRect rect = getPositiveRect(startPos,endPos);
         QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
@@ -226,7 +226,6 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
         if(m_toolbarItem->isVisible() && toolBarItemRect.contains(event->pos()))
         {
             return QGraphicsView::mousePressEvent(event);
-            return ;
         }
         m_startPoint = event->pos();
         m_selectRect = m_selectRectItem->getSelectRect();
@@ -266,7 +265,6 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
 
 void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
 {
-    //
     if(m_isLocked)
     {
         event->accept();
@@ -612,11 +610,14 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
     }
     m_previewItem->setPos(x,y);
 
+    //暂时只支持win
+#ifdef Q_OS_WIN
     if(!m_previewItem->isVisible())
     {
         emit sigPreviewItemShow();
         m_previewItem->setVisible(true);
     }
+#endif
 }
 
 void CScreenShotView::setShotStatus(CScreenShotStatus status)

@@ -65,7 +65,7 @@ CScreenButtonType CScreenEditorToolbarItem::getCurrentButtonType()
 
 void CScreenEditorToolbarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__<<"mouseReleaseEvent";
+    LOG_TEST("mouseReleaseEvent");
     return QGraphicsObject::mouseReleaseEvent(event);
 }
 

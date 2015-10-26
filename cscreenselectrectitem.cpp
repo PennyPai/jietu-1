@@ -73,19 +73,16 @@ QRectF CScreenSelectRectItem::getSelectRect() const
 
 void CScreenSelectRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__;
     return QGraphicsRectItem::mousePressEvent(event);
 }
 
 void CScreenSelectRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__;
     return QGraphicsRectItem::mouseMoveEvent(event);
 }
 
 void CScreenSelectRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__;
     return QGraphicsRectItem::mouseReleaseEvent(event);
 }
 
