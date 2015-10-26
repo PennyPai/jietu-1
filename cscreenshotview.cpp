@@ -175,6 +175,17 @@ QRgb CScreenShotView::getPixmapPosRgb(const QPixmap &pixmap, const QPoint &pos)
     return QRgb();
 }
 
+void CScreenShotView::doFinished()
+{
+    if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
+    {
+        m_toolbarItem->setVisible(false);
+        m_tooltipSizeItem->setVisible(false);
+        //延迟获取图片，否则工具栏可能不消失
+        QTimer::singleShot(10, this, SLOT(onFinishTimerOut()));
+    }
+}
+
 bool CScreenShotView::event(QEvent *event)
 {
 //    LOG_TEST(QString("EVENT type %1").arg(event->type()));
@@ -196,15 +207,6 @@ void CScreenShotView::keyPressEvent(QKeyEvent *event)
 
 void CScreenShotView::mousePressEvent(QMouseEvent *event)
 {
-    if(event->pos().y() == 899)
-    {
-        LOG_TEST(QString("event->pos().y() == 899"));
-    }
-    if(event->pos().y() == 900)
-    {
-        LOG_TEST(QString("event->pos().y() == 900"));
-    }
-
     if(event->button() == Qt::RightButton)
     {
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
@@ -314,6 +316,21 @@ void CScreenShotView::mouseDoubleClickEvent(QMouseEvent *event)
         event->accept();
         return;
     }
+    if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
+    {
+        bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
+        QRect toolbarRect(m_toolbarItem->pos().x(),
+                          m_toolbarItem->pos().y(),
+                          m_toolbarItem->boundingRect().width(),
+                          m_toolbarItem->boundingRect().height());
+        if(isContains && !toolbarRect.contains(event->pos()) && m_toolbarItem->isVisible())
+        {
+            event->accept();
+            doFinished();
+            return;
+        }
+    }
+
     return QGraphicsView::mouseDoubleClickEvent(event);
 }
 
@@ -623,13 +640,7 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
         }
         break;
     case CSCREEN_BUTTON_TYPE_OK:
-        if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
-        {
-            m_toolbarItem->setVisible(false);
-            m_tooltipSizeItem->setVisible(false);
-            //延迟获取图片，否则工具栏可能不消失
-            QTimer::singleShot(10, this, SLOT(onFinishTimerOut()));
-        }
+        doFinished();
         LOG_TEST(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
         break;
     case CSCREEN_BUTTON_TYPE_CANCLE:

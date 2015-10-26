@@ -74,13 +74,7 @@ void CScreenEditorButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CScreenEditorButtonItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-//    if(m_isPressed)
     qDebug()<<Q_FUNC_INFO<<__LINE__<<"mouseReleaseEvent";
-
-    {
-        m_isPressed = false;
-        update();
-    }
     QGraphicsObject::mouseReleaseEvent(event);
 }
 

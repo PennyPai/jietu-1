@@ -49,6 +49,7 @@ private:
     QPixmap createPixmap();
     QString getSizeString(const QSize &size) const;
     QRgb getPixmapPosRgb(const QPixmap &pixmap,const QPoint &pos);
+    void doFinished();
 
 private slots:
     void onButtonClicked(CScreenButtonType type);
