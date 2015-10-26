@@ -22,7 +22,7 @@ private:
     QColor m_colorBackgroud;
     QColor m_colorText;
     static const int m_textPointSize = 12;
-    static const qreal m_rectRadius = 2.5;
+    static const int m_rectRadius = 3;
 };
 
 #endif // CSCREENTOOLTIPITEM_H

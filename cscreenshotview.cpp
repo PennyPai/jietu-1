@@ -75,6 +75,9 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     m_previewItem->setVisible(false);
     m_previewItem->setZValue(m_toolbarItem->zValue() + 1);
     m_screen->addItem(m_previewItem);
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setStyleSheet("QWidget{border: 0px solid #1880ed;}");
 }
 
 CScreenShotView::~CScreenShotView()
@@ -90,7 +93,13 @@ CScreenShotView::~CScreenShotView()
 
 void CScreenShotView::startSCreenShot()
 {
+//#ifdef Q_OS_WIN
+//    QWidget w;
+//    this->setWindowFlags(w.windowFlags() | Qt::Tool);
+//    this->setWindowModality(Qt::WindowModal);
+//#else
     this->overrideWindowFlags(Qt::ToolTip);
+//#endif
     this->showFullScreen();
 //    this->overrideWindowFlags(Qt::Sheet | Qt::Window );
 //    showFullScreen();
