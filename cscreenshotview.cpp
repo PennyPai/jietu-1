@@ -4,6 +4,7 @@
 #include <QGraphicsProxyWidget>
 #include <QClipboard>
 #include <QTimer>
+#include <QRgb>
 #include "cscreenshotview.h"
 #include "cscreenshotscene.h"
 #include "cscreenselectrectitem.h"
@@ -27,20 +28,17 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     ,m_toolbarItem(NULL)
     ,m_currentRectItem(NULL)
     ,m_tooltipSizeItem(NULL)
+    ,m_previewItem(NULL)
     ,m_positionType(CSCREEN_POSITION_TYPE_NOT_CONTAIN)
     ,m_shotStatus(CSCREEN_SHOT_STATE_INITIALIZED)
     ,m_isPressed(false)
     ,m_isLocked(false)
 {
-//   m_flags = this->windowFlags();
-//    setWindowFlags(Qt::FramelessWindowHint);
-//    setWindowModality(Qt::WindowModal);
-//    this->setWindowFlags(this->windowFlags() | Qt::Tool);
-    //======
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
     QDesktopWidget * pDesktoWidget = QApplication::desktop();
     QRect geometry= screen->geometry();
+//    QRect geometry= screen->availableVirtualGeometry();
     LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
              .arg(geometry.x())
              .arg(geometry.y())
@@ -51,24 +49,14 @@ CScreenShotView::CScreenShotView(QScreen *screen,
                                         ,geometry.y(),geometry.width(),geometry.height());
 
     drawPixmap(pixmap);
-       m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
+    m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
     this->setGeometry(geometry);
-//    qDebug()<<"transform"<<this->transform();
+
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();
     m_sy = 1.0 * geometry.height() / pixmap.height();
-    {//TYPE01
-        //    qreal sy = 1.0 * geometry.height() / pixmap.height();
-        //    this->scale(sx,sy);
-        //    qDebug()<<"transform"<<this->transform();
-        //    qreal dx = geometry.width() * (sx - 1) / 2 / sx;
-        //    qreal dy = geometry.height() * (sy - 1) / 2 / sy;
-        //    m_backgroundItem->moveBy(dx,dy);
-    }
-    {//TYPE02s
-        m_backgroundItem->setScale(m_sx);
-    }
+    m_backgroundItem->setScale(m_sx);
     m_selectRectItem = new CScreenSelectRectItem(m_desktopPixmap);
     m_selectRectItem->setScale(m_sx);
     m_selectRectItem->setVisible(false);
@@ -83,6 +71,10 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     m_tooltipSizeItem = new CScreenTooltipItem;
     m_tooltipSizeItem->setVisible(false);
     m_screen->addItem(m_tooltipSizeItem);
+    m_previewItem = new QGraphicsPixmapItem;
+    m_previewItem->setVisible(false);
+    m_previewItem->setZValue(m_toolbarItem->zValue() + 1);
+    m_screen->addItem(m_previewItem);
 }
 
 CScreenShotView::~CScreenShotView()
@@ -100,8 +92,7 @@ void CScreenShotView::startSCreenShot()
 {
     this->overrideWindowFlags(Qt::ToolTip);
     this->showFullScreen();
-    this->overrideWindowFlags(Qt::Sheet | Qt::Window );
-
+//    this->overrideWindowFlags(Qt::Sheet | Qt::Window );
 //    showFullScreen();
 //    resize(m_desktopScreen->geometry().size());
 //    move(m_desktopScreen->geometry().x(),m_desktopScreen->geometry().y());
@@ -119,6 +110,11 @@ void CScreenShotView::setLocked(bool locked)
 QPixmap CScreenShotView::getPixmap()
 {
     return m_pixmap;
+}
+
+void CScreenShotView::setPreviewItemHidden(bool isHidden)
+{
+    m_previewItem->setVisible(!isHidden);
 }
 
 QPixmap CScreenShotView::createPixmap()
@@ -153,8 +149,26 @@ QString CScreenShotView::getSizeString(const QSize &size) const
     return QString("%1 * %2").arg(size.width()).arg(size.height());
 }
 
+QRgb CScreenShotView::getPixmapPosRgb(const QPixmap &pixmap, const QPoint &pos)
+{
+    QPixmap posPixmap = pixmap.copy(pos.x(), pos.y(), 1, 1);
+    if (!posPixmap.isNull())
+    {
+        QImage image = posPixmap.toImage();
+        if (!image.isNull())
+        {
+            if(image.valid(0, 0))
+            {
+                return image.pixel(0, 0);
+            }
+        }
+    }
+    return QRgb();
+}
+
 bool CScreenShotView::event(QEvent *event)
 {
+//    LOG_TEST(QString("EVENT type %1").arg(event->type()));
     return QGraphicsView::event(event);
 }
 
@@ -173,6 +187,15 @@ void CScreenShotView::keyPressEvent(QKeyEvent *event)
 
 void CScreenShotView::mousePressEvent(QMouseEvent *event)
 {
+    if(event->pos().y() == 899)
+    {
+        LOG_TEST(QString("event->pos().y() == 899"));
+    }
+    if(event->pos().y() == 900)
+    {
+        LOG_TEST(QString("event->pos().y() == 900"));
+    }
+
     if(event->button() == Qt::RightButton)
     {
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
@@ -217,6 +240,10 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
                 m_screen->addItem(m_currentRectItem);
             }
         }
+        if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
+        {
+            updatePreviewItem(event->pos());
+        }
 
     }
     else
@@ -247,10 +274,12 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             {
                 m_selectRect = selectRect;
                 setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
+                m_previewItem->setVisible(false);
             }
             else
             {
                 m_selectRectItem->setSelectedRect(QRectF(0,0,0,0));
+                updatePreviewItem(event->pos());
             }
             m_selectRectItem->setVisible(visible);
             m_toolbarItem->setVisible(visible);
@@ -265,12 +294,8 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             m_currentRectItem = NULL;
         }
     }
-
-    //    m_selectRect = m_selectRectItem->getSelectRect();
     m_isPressed = false;
-
     QGraphicsView::mouseReleaseEvent(event);
-//    m_screen->update();
 }
 
 void CScreenShotView::mouseDoubleClickEvent(QMouseEvent *event)
@@ -359,7 +384,17 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             m_currentRectItem->setVisible(true);
         }
     }
+    if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
+    {
+        updatePreviewItem(event->pos());
+    }
     return QGraphicsView::mouseMoveEvent(event);
+}
+
+void CScreenShotView::leaveEvent(QEvent *event)
+{
+    LOG_TEST(QString("leaveEvent "));
+    return QGraphicsView::leaveEvent(event);
 }
 
 CScreenRectItem *CScreenShotView::createRectItem()
@@ -367,14 +402,7 @@ CScreenRectItem *CScreenShotView::createRectItem()
     QPointF topLeftPos = getPointFromSelectedItem(m_selectRect.topLeft());
     QPointF bottomRightPos = getPointFromSelectedItem(m_selectRect.bottomRight());
     QRect rect = getPositiveRect(topLeftPos,bottomRightPos);
-
     CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
-//    QUrl
-//    QPen pen;QUrl
-//    pen.setWidth(1);
-//    pen.setColor(QColor(Qt::red));
-//    item->setPen(pen);
-//    item->setZValue(-1);
     return item;
 }
 
@@ -466,6 +494,103 @@ void CScreenShotView::updateTooltipItem()
     }
     m_tooltipSizeItem->setPos(x,y);
     m_tooltipSizeItem->setVisible(true);
+}
+
+void CScreenShotView::updatePreviewItem(const QPoint &pos)
+{
+    QPixmap pixmap(m_previewItemWidth,m_previewItemPixmapHeight+m_previewItemTextHeight);
+    pixmap.fill(QColor(Qt::white));
+    QPainter painter(&pixmap);
+    painter.setRenderHints(QPainter::TextAntialiasing
+                           | QPainter::SmoothPixmapTransform
+                            | QPainter::HighQualityAntialiasing
+                            | QPainter::NonCosmeticDefaultPen
+                            | QPainter::Qt4CompatiblePainting);
+    QPointF toItemPos = getPointToSelectedItem(pos);
+
+    qreal scaleSize = 3;
+    {//draw preview
+
+        qreal width = m_previewItemWidth / scaleSize;
+        qreal height = m_previewItemPixmapHeight / scaleSize;
+        qreal x = (toItemPos.x() - 0.5 * width);
+        QPointF pos(0,0);
+        if(x < 0)
+        {
+            width = width + x;
+            pos.setX(-x * scaleSize);
+            x = 0;
+        }
+        else
+        {
+            width = qMin(width,m_desktopPixmap.width() - x);
+        }
+        qreal y = (toItemPos.y() - 0.5 * height);
+        if(y < 0)
+        {
+            height += y;
+            pos.setY(-y * scaleSize);
+            y = 0;
+        }
+        else
+        {
+            height = qMin(height,m_desktopPixmap.height() - y);
+        }
+        QPixmap pixmap = m_desktopPixmap.copy(x,y,width,height).scaled(width * scaleSize,height * scaleSize);
+        painter.drawImage(pos,pixmap.toImage());
+        QColor lineColor("#89D4EB");
+        lineColor.setAlpha(128);
+        QPen pen(lineColor);
+        pen.setWidth(m_previewLineWidth);
+        painter.setPen(pen);
+        QLineF hLine(0,0.5 * m_previewItemPixmapHeight,m_previewItemWidth,0.5 * m_previewItemPixmapHeight);
+        painter.drawLine(hLine);
+        QLineF vLine(0.5 * m_previewItemWidth,0,0.5 * m_previewItemWidth,m_previewItemPixmapHeight);
+        painter.drawLine(vLine);
+    }
+
+    QRectF textRect(0,m_previewItemPixmapHeight,m_previewItemWidth,m_previewItemTextHeight);
+    {//draw text background
+        QBrush textBrush(QColor("#4F4F4F"));
+        QPen pen(Qt::NoPen);
+        painter.setPen(pen);
+        painter.setBrush(textBrush);
+        painter.drawRect(textRect);
+    }
+    {//draw text
+        QRgb pointRgb = getPixmapPosRgb(m_desktopPixmap,toItemPos.toPoint());
+        QFont font;
+        font.setPointSize(m_previewPointSize);
+        painter.setFont(font);
+        QColor textColor("#B8B8B8");
+        QPen pen(textColor);
+        painter.setPen(pen);
+        QString text = QString("(%1,%2)\nRGB:(%3,%4,%5)")
+                .arg(pos.x())
+                .arg(pos.y())
+                .arg(qRed(pointRgb))
+                .arg(qGreen(pointRgb))
+                .arg(qBlue(pointRgb));
+        painter.drawText(textRect,Qt::AlignCenter,text);
+    }
+    m_previewItem->setPixmap(pixmap);
+    qreal x = pos.x() - m_previewItemDx - pixmap.width();
+    if(x < 0)
+    {
+        x = pos.x() + m_previewItemDy;
+    }
+    qreal y = pos.y() + m_previewItemDy;
+    if(y + pixmap.height() > this->height())
+    {
+        y = pos.y() - m_previewItemDy - pixmap.height();
+    }
+    m_previewItem->setPos(x,y);
+
+    if(!m_previewItem->isVisible())
+    {
+        emit sigPreviewItemShow();
+        m_previewItem->setVisible(true);
+    }
 }
 
 void CScreenShotView::setShotStatus(CScreenShotStatus status)

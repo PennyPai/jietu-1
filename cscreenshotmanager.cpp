@@ -43,6 +43,8 @@ void CScreenShotManager::startScreenShot()
         m_viewList.append(view);
         connect(view,SIGNAL(sigStatusChanged(CScreenShotStatus)),
                 this,SLOT(onStatusChanged(CScreenShotStatus)));
+        connect(view,SIGNAL(sigPreviewItemShow()),
+                this,SLOT(onPreviewItemShow()));
         view->startSCreenShot();
 //        view->show();
         view->raise();
@@ -120,6 +122,23 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         if(status == CSCREEN_SHOT_STATE_FINISHED)
         {
             emit sigScreenShotPixmapChanged(pixmap);
+        }
+    }
+}
+
+void CScreenShotManager::onPreviewItemShow()
+{
+    CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
+    if(view == NULL)
+    {
+        LOG_WARNING(QString("view is NULL"));
+        return;
+    }
+    foreach (CScreenShotView *d, m_viewList)
+    {
+        if(d != view)
+        {
+            d->setPreviewItemHidden(true);
         }
     }
 }

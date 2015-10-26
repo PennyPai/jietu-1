@@ -24,6 +24,7 @@ protected:
 
 private slots:
     void onStatusChanged(CScreenShotStatus status);
+    void onPreviewItemShow();
 
 signals:
     void sigScreenShotPixmapChanged(const QPixmap &pixmap);
