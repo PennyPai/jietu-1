@@ -20,7 +20,7 @@ CScreenColorToolbarItem::CScreenColorToolbarItem(QGraphicsItem *parent)
     m_currentColor = colorStringList.first();
     qreal x = 0;
     qreal y = m_margin_top;
-    QImage hoverImage(":/screenshot/res/screenshot/colorbuttombg_hover.png");
+    QImage hoverImage(":/screenshot/res/screenshot/colorbuttonbg_hover.png");
     foreach (QColor color, colorStringList)
     {
         QRectF rect(x,y,m_colorItemWidth,m_colorItemHeight);

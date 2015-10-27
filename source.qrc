@@ -22,7 +22,7 @@
         <file>res/screenshot/word_icon_normal.png</file>
         <file>res/screenshot/word_icon_pressed.png</file>
         <file>res/screenshot/colorbuttonbg_normal.png</file>
-        <file>res/screenshot/colorbuttombg_pressed.png</file>
-        <file>res/screenshot/colorbuttombg_hover.png</file>
+        <file>res/screenshot/colorbuttonbg_pressed.png</file>
+        <file>res/screenshot/colorbuttonbg_hover.png</file>
     </qresource>
 </RCC>
