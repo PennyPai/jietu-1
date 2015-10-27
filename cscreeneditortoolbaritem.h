@@ -6,6 +6,7 @@
 #include "clogsetting.h"
 
 class CScreenEditorButtonItem;
+class CScreenAttributeToolbarItem;
 
 class CScreenEditorToolbarItem : public QGraphicsObject
 {
@@ -18,12 +19,17 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     CScreenButtonType getCurrentButtonType();
+    int getLineWidth() const;
+    QColor getColor() const;
 
 protected:
 //    void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 //    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 //    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
+private:
+    void updateAttributeToolbar(const qreal centerX);
 
 private slots:
     void onButtonClicked();
@@ -35,12 +41,14 @@ private:
     CScreenEditorButtonItem *m_rectButtonItem;
     CScreenEditorButtonItem *m_cancelButtonItem;
     CScreenEditorButtonItem *m_okButtonItem;
+    CScreenAttributeToolbarItem *m_attributeToolbarItem;
     QRectF m_rect;
     CScreenButtonType m_currentButtonType;
     static const int m_buttonWidth = 25;
     static const int m_buttonHeight = 25;
     static const int m_toolbarHeight = 35;
     static const int m_buttonMargin = 8;
+    static const int m_marginAttributeToolbarWidthBottom = 10;
 };
 
 #endif // _CSCREENEDITORTOOLBARITEM_H_

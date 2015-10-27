@@ -13,7 +13,14 @@ public:
     ~CScreenEditorButtonItem();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    void clearSelected();
+    void setSelected(bool isSelected = false);
+    void setIsHover(bool isHover);
+    void setNormalBackground(const QImage &image);
+    void setHoverBackground(const QImage &image);
+    void setPressedBackground(const QImage &image);
+    void setNormalIcon(const QImage &image);
+    void setPressedIcon(const QImage &image);
+    void setRect(const QRectF &rect);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -30,6 +37,9 @@ private:
     bool m_isPressed;
     QImage m_imageNormal;
     QImage m_imagePressed;
+    QImage m_imageNormalBackground;
+    QImage m_imageHoverBackground;
+    QImage m_imagePressedBackground;
     QRectF m_rect;
 };
 

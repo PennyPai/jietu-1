@@ -7,6 +7,7 @@ CScreenRectItem::CScreenRectItem(const QRectF &rect, const QRectF &painterRect, 
     :QGraphicsObject(parent)
     ,m_rect(rect)
     ,m_painterRect(painterRect)
+    ,m_lineWidth(1)
 {
     //
 }
@@ -36,6 +37,26 @@ void CScreenRectItem::setPainterRect(const QRectF &rect)
     update();
 }
 
+void CScreenRectItem::setLineWidth(int width)
+{
+    if(m_lineWidth == width)
+    {
+        return;
+    }
+    m_lineWidth = width;
+    update();
+}
+
+void CScreenRectItem::setLineColor(const QColor &color)
+{
+    if(m_lineColor == color)
+    {
+        return;
+    }
+    m_lineColor = color;
+    update();
+}
+
 QPixmap CScreenRectItem::createBackgroupdPixmap()
 {
     qreal x = m_painterRect.x() - m_rect.x();
@@ -44,8 +65,8 @@ QPixmap CScreenRectItem::createBackgroupdPixmap()
     pixmap.fill(QColor(0,0,0,0));
     QPainter painter(&pixmap);
     QPen pen;
-    QColor color(Qt::red);
-    pen.setColor(color);
+    pen.setColor(m_lineColor);
+    pen.setWidth(m_lineWidth);
     painter.setPen(pen);
     painter.drawRect(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
     return pixmap;

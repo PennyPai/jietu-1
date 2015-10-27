@@ -1,6 +1,8 @@
 #ifndef _CSCREENPUBLIC_H_
 #define _CSCREENPUBLIC_H_
 
+#define C_SCREEN_ZERO  0.000000001
+
 enum CScreenShotStatus
 {
     CSCREEN_SHOT_STATE_INITIALIZED,
@@ -31,6 +33,12 @@ enum CScreenButtonType
     CSCREEN_BUTTON_TYPE_RECT,
     CSCREEN_BUTTON_TYPE_CANCLE,
     CSCREEN_BUTTON_TYPE_OK,
+};
+
+enum CScreenArrowDirection
+{
+    CSCREEN_ARROW_DIRECTION_UP,
+    CSCREEN_ARROW_DIRECTION_DOWN,
 };
 
 #endif // _CSCREENPUBLIC_H_

@@ -427,6 +427,8 @@ CScreenRectItem *CScreenShotView::createRectItem()
     QPointF bottomRightPos = getPointFromSelectedItem(m_selectRect.bottomRight());
     QRect rect = getPositiveRect(topLeftPos,bottomRightPos);
     CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
+    item->setLineColor(m_toolbarItem->getColor());
+    item->setLineWidth(m_toolbarItem->getLineWidth());
     return item;
 }
 

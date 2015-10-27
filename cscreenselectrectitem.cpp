@@ -2,7 +2,7 @@
 #include <QBrush>
 #include <QGraphicsSceneMouseEvent>
 #include "cscreenselectrectitem.h"
-#include <QDebug>
+#include "cscreenpublic.h"
 
 CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
@@ -45,7 +45,7 @@ void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
 
 void CScreenSelectRectItem::setScale(qreal scale)
 {
-    if(qAbs(scale) < 0.00000000001)
+    if(qAbs(scale) < C_SCREEN_ZERO)
     {
         return;
     }

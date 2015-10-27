@@ -14,6 +14,8 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     void setPainterRect(const QRectF &rect);
+    void setLineWidth(int width);
+    void setLineColor(const QColor &color);
 
 private:
     QPixmap createBackgroupdPixmap();
@@ -21,6 +23,8 @@ private:
 private:
     QRectF m_rect;
     QRectF m_painterRect;
+    int m_lineWidth;
+    QColor m_lineColor;
 };
 
 #endif // _CSCREENRECTITEM_H_

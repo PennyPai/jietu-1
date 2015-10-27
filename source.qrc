@@ -11,18 +11,18 @@
         <file>res/screenshot/confirm_icon_normal.png</file>
         <file>res/screenshot/buttonhoverbg.png</file>
         <file>res/screenshot/buttonpressedbg.png</file>
-        <file>res/screenshot/linewidth_big.png</file>
-        <file>res/screenshot/linewidth_mid.png</file>
+        <file>res/screenshot/linewidth_large.png</file>
+        <file>res/screenshot/linewidth_middle.png</file>
         <file>res/screenshot/linewidth_small.png</file>
-        <file>res/screenshot/linewidthbg.png</file>
+        <file>res/screenshot/linewidthbg_pressed.png</file>
         <file>res/screenshot/round_icon_normal.png</file>
         <file>res/screenshot/round_icon_pressed.png</file>
         <file>res/screenshot/rect_icon_normal.png</file>
         <file>res/screenshot/rect_icon_pressed.png</file>
         <file>res/screenshot/word_icon_normal.png</file>
         <file>res/screenshot/word_icon_pressed.png</file>
-        <file>res/screenshot/wordbg_normal.png</file>
-        <file>res/screenshot/wordbg_pressed.png</file>
-        <file>res/screenshot/wordhighlightbg.png</file>
+        <file>res/screenshot/colorbuttonbg_normal.png</file>
+        <file>res/screenshot/colorbuttombg_pressed.png</file>
+        <file>res/screenshot/colorbuttombg_hover.png</file>
     </qresource>
 </RCC>
