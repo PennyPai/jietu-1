@@ -13,7 +13,7 @@ CScreenAttributeToolbarItem::CScreenAttributeToolbarItem(QGraphicsItem *parent)
     , m_colorButtonItem(NULL)
     , m_rect(0,0,0,0)
     , m_arrowDirection(CSCREEN_ARROW_DIRECTION_UP)
-    , m_lineWidth(1)
+    , m_lineWidth(m_lineWidthSmall)
     , m_arrawDx(0)
 {
     m_colorToolbarItem = new CScreenColorToolbarItem(this);
@@ -196,21 +196,21 @@ void CScreenAttributeToolbarItem::onItemClicked()
 
     if(buttonItem == m_lineWidthSmallButtonItem)
     {
-        m_lineWidth = 1;
+        m_lineWidth = m_lineWidthSmall;
         //        m_lineWidthSmallItem->setSelected(false);
         m_lineWidthMiddleButtonItem->setSelected(false);
         m_lineWidthLargeButtonItem->setSelected(false);
     }
     else if(buttonItem == m_lineWidthMiddleButtonItem)
     {
-        m_lineWidth = 2;
+        m_lineWidth = m_lineWidthMiddle;
         m_lineWidthSmallButtonItem->setSelected(false);
         //        m_lineWidthMiddleItem->setSelected(false);
         m_lineWidthLargeButtonItem->setSelected(false);
     }
     else if(buttonItem == m_lineWidthLargeButtonItem)
     {
-        m_lineWidth = 3;
+        m_lineWidth = m_lineWidthLarge;
         m_lineWidthSmallButtonItem->setSelected(false);
         m_lineWidthMiddleButtonItem->setSelected(false);
         //        m_lineWidthLargeItem->setSelected(false);
