@@ -93,7 +93,11 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
                 d->setVisible(false);
                 d->setWindowState((d->windowState() & ~Qt::WindowActive) | Qt::WindowMinimized);
                 //END=======================
-                d->deleteLater();
+#ifdef Q_OS_WIN
+            firstView->setVisible(false);
+#else
+            firstView->deleteLater();
+#endif
             }
             else
             {
@@ -116,9 +120,13 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
              //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
             firstView->setWindowOpacity(0.01);
             firstView->showMinimized();
+#ifdef Q_OS_WIN
+            firstView->setVisible(false);
+#else
             firstView->deleteLater();
+            m_viewList.clear();
+#endif
         }
-        m_viewList.clear();
         if(status == CSCREEN_SHOT_STATE_FINISHED)
         {
             emit sigScreenShotPixmapChanged(pixmap);
