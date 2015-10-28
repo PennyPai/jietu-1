@@ -10,6 +10,7 @@ CScreenShotManager * CScreenShotManager::m_instance = NULL;
 
 CScreenShotManager::CScreenShotManager(QObject *parent)
     :QObject(parent)
+    ,m_isRunning(false)
 {
 }
 
@@ -29,6 +30,10 @@ CScreenShotManager::~CScreenShotManager()
 
 void CScreenShotManager::startScreenShot()
 {
+    if(m_isRunning)
+    {
+        return;
+    }
     clearAll();
     QList<QScreen *> screens = QApplication::screens();
     int index = 0;
@@ -44,6 +49,7 @@ void CScreenShotManager::startScreenShot()
         view->startSCreenShot();
         view->raise();
     }
+    m_isRunning = true;
 }
 
 void CScreenShotManager::clearAll()
@@ -117,6 +123,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         {
             emit sigScreenShotPixmapChanged(pixmap);
         }
+        m_isRunning = false;
     }
 }
 

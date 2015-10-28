@@ -31,6 +31,7 @@ signals:
 
 private:
     static CScreenShotManager *m_instance;
+    bool m_isRunning;
     QList<CScreenShotView *> m_viewList;
 };
 
