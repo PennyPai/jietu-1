@@ -61,7 +61,6 @@ private:
     static const int m_lineWidthSmall = 3;
     static const int m_lineWidthMiddle = 6;
     static const int m_lineWidthLarge = 9;
-
 };
 
 #endif // _CSCREENATTRIBUTETOOLBARITEM_H_

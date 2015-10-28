@@ -22,12 +22,6 @@ public:
     int getLineWidth() const;
     QColor getColor() const;
 
-protected:
-//    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-//    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-//    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
 private:
     void updateAttributeToolbar(const qreal centerX);
 

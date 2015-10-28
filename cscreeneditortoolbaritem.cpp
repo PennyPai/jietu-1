@@ -82,12 +82,6 @@ QColor CScreenEditorToolbarItem::getColor() const
     return m_attributeToolbarItem->getColor();
 }
 
-void CScreenEditorToolbarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    LOG_TEST("mouseReleaseEvent");
-    return QGraphicsObject::mouseReleaseEvent(event);
-}
-
 void CScreenEditorToolbarItem::updateAttributeToolbar(const qreal centerX)
 {
     QGraphicsScene *scene = this->scene();

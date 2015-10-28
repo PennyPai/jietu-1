@@ -38,7 +38,6 @@ private:
     QGraphicsEllipseItem *m_leftMiddleEllipseItem;
     QGraphicsEllipseItem *m_rightMiddleEllipseItem;
     //TODO ==END== 为后期选择移动准备
-//    QGraphicsRectItem *m_borderItem;
     QPixmap m_desktopPixmap;
     QColor m_penColor;
     QRectF m_rect;

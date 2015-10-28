@@ -35,10 +35,6 @@ void CScreenShotManager::startScreenShot()
     foreach (QScreen *d, screens)
     {
         index++;
-        if(index % 2 == 0)
-        {
-//            continue;
-        }
         CScreenShotView *view = new CScreenShotView(d);
         m_viewList.append(view);
         connect(view,SIGNAL(sigStatusChanged(CScreenShotStatus)),
@@ -46,9 +42,7 @@ void CScreenShotManager::startScreenShot()
         connect(view,SIGNAL(sigPreviewItemShow()),
                 this,SLOT(onPreviewItemShow()));
         view->startSCreenShot();
-//        view->show();
         view->raise();
-
     }
 }
 

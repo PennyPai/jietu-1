@@ -6,14 +6,12 @@
 CScreenTooltipItem::CScreenTooltipItem(QGraphicsItem *parent)
     :QGraphicsObject(parent)
     ,m_rect(0,0,82,19)
+    ,m_text("")
     ,m_colorBackgroud("#d3d3d3")
     ,m_colorText("#ffffff")
 {
     this->setOpacity(0.8);
-    m_text = QString("121 * 123");
 }
-
-
 
 CScreenTooltipItem::~CScreenTooltipItem()
 {

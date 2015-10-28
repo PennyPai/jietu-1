@@ -38,7 +38,6 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     this->setScene(m_screen);
     QDesktopWidget *pDesktoWidget = QApplication::desktop();
     QRect geometry= screen->geometry();
-//    QRect geometry= screen->availableVirtualGeometry();
     LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
              .arg(geometry.x())
              .arg(geometry.y())
@@ -101,10 +100,6 @@ void CScreenShotView::startSCreenShot()
     this->overrideWindowFlags(Qt::ToolTip);
 //#endif
     this->showFullScreen();
-//    this->overrideWindowFlags(Qt::Sheet | Qt::Window );
-//    showFullScreen();
-//    resize(m_desktopScreen->geometry().size());
-//    move(m_desktopScreen->geometry().x(),m_desktopScreen->geometry().y());
 }
 
 void CScreenShotView::setLocked(bool locked)
@@ -509,7 +504,6 @@ void CScreenShotView::updateTooltipItem()
     QPointF bottomRightPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().bottomRight());
     QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
     m_tooltipSizeItem->setText(getSizeString(rect.size().toSize()));
-//    m_tooltipSizeItem->setText("FADFASDFDSF");
     qreal x = rect.left();
     qreal y = rect.top() - m_tooltipSizeItem->boundingRect().height()
             - m_selectRectItem->pen().width() * m_sx
@@ -661,4 +655,3 @@ void CScreenShotView::onFinishTimerOut()
     clipboard->setPixmap(m_pixmap);
     setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
 }
-

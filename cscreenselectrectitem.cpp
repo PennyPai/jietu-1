@@ -14,7 +14,6 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
     , m_bottomRightEllipseItem(NULL)
     , m_leftMiddleEllipseItem(NULL)
     , m_rightMiddleEllipseItem(NULL)
-//    , m_borderItem(NULL)
     , m_desktopPixmap(desktopPixmap)
     , m_penColor(QColor("#00ACFF"))
 {
@@ -23,11 +22,9 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
 
 //    m_penColor.setAlpha(128);
     QPen pen(m_penColor);
-//    QPen pen(Qt::NoPen);
     pen.setWidth(m_penWidth);
     this->setPen(pen);
     this->setAcceptedMouseButtons(Qt::LeftButton);
-//    this->setFlag(QGraphicsItem::ItemIsMovable,true);
 }
 
 void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
@@ -39,7 +36,6 @@ void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
                      m_rect.width() + 2 * penWidth,
                      m_rect.height() + 2 * penWidth);
     QGraphicsRectItem::setRect(adjustRect);
-//    QGraphicsRectItem::setRect(m_rect);
     updateEllipseItems();
 }
 
@@ -53,7 +49,6 @@ void CScreenSelectRectItem::setScale(qreal scale)
     {
         return;
     }
-//    QPen pen(Qt::NoPen);
     QPen pen(m_penColor);
     pen.setWidth(m_penWidth / scale);
     this->setPen(pen);
