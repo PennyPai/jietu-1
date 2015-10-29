@@ -1,5 +1,5 @@
-#ifndef CSCREENSHOTDIALOG_H
-#define CSCREENSHOTDIALOG_H
+#ifndef _CSCREENSHOTDIALOG_H_
+#define _CSCREENSHOTDIALOG_H_
 
 #include <QDialog>
 #include "cscreenpublic.h"
@@ -18,7 +18,10 @@ public:
     void setLocked(bool locked);
     QPixmap getPixmap();
     void setPreviewItemHidden(bool isHidden);
-    
+
+protected:
+    bool event(QEvent *e);
+
 signals:
     void sigStatusChanged(CScreenShotStatus status);
     void sigPreviewItemShow();
@@ -27,4 +30,4 @@ private:
     CScreenShotView *m_view;
 };
 
-#endif // CSCREENSHOTDIALOG_H
+#endif // _CSCREENSHOTDIALOG_H_

@@ -90,18 +90,6 @@ CScreenShotView::~CScreenShotView()
     }
 }
 
-void CScreenShotView::startSCreenShot()
-{
-//#ifdef Q_OS_WIN
-//    QWidget w;
-//    this->setWindowFlags(w.windowFlags() | Qt::Tool);
-//    this->setWindowModality(Qt::WindowModal);
-//#else
-    this->overrideWindowFlags(Qt::ToolTip);
-//#endif
-    this->showFullScreen();
-}
-
 void CScreenShotView::setLocked(bool locked)
 {
     if(m_isLocked == locked)
@@ -179,12 +167,6 @@ void CScreenShotView::doFinished()
         //延迟获取图片，否则工具栏可能不消失
         QTimer::singleShot(10, this, SLOT(onFinishTimerOut()));
     }
-}
-
-bool CScreenShotView::event(QEvent *event)
-{
-//    LOG_TEST(QString("EVENT type %1").arg(event->type()));
-    return QGraphicsView::event(event);
 }
 
 void CScreenShotView::keyPressEvent(QKeyEvent *event)

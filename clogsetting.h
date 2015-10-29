@@ -1,11 +1,12 @@
 #ifndef _CLOGSETTING_H_
 #define _CLOGSETTING_H_
 #include <QDebug>
+#include <QTime>
 
 #define LOG4QT_DECLARE_QCLASS_LOGGER
 
 //#define LOG_HEAD QString(Q_FUNC_INFO) + QString("[Line:") + QString::number(__LINE__) + QString("]")
-#define LOG_HEAD QString("[Line:%1][%2]").arg(QString::number(__LINE__)).arg(Q_FUNC_INFO)
+#define LOG_HEAD QString("[Line:%1][%2][%3]").arg(QString::number(__LINE__)).arg(Q_FUNC_INFO).arg(QTime::currentTime().toString("hh:mm:ss"))
 
 #define LOG_TEST(testLog) qDebug() << LOG_HEAD << "[TRACE]" << testLog;
 #define LOG_TEST_ROOT(testLog) qDebug() << LOG_HEAD << "[TRACE]" << testLog;
