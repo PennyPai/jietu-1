@@ -23,4 +23,6 @@ void Dialog::on_pushButton_clicked()
 void Dialog::on_pushButton_2_clicked()
 {
 //    this->showFullScreen();
+    this->showMinimized();
+    on_pushButton_clicked();
 }

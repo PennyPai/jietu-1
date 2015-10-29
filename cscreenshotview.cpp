@@ -50,7 +50,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     drawPixmap(pixmap);
     m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
-    this->setGeometry(geometry);
+//    this->setGeometry(geometry);
 
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     cscreenrectitem.cpp \
     cscreentooltipitem.cpp \
     cscreenattributetoolbaritem.cpp \
-    cscreencolortoolbaritem.cpp
+    cscreencolortoolbaritem.cpp \
+    cscreenshotdialog.cpp
 
 HEADERS  += dialog.h \
     cscreenshotview.h \
@@ -39,7 +40,8 @@ HEADERS  += dialog.h \
     cscreenrectitem.h \
     cscreentooltipitem.h \
     cscreenattributetoolbaritem.h \
-    cscreencolortoolbaritem.h
+    cscreencolortoolbaritem.h \
+    cscreenshotdialog.h
 
 FORMS    += dialog.ui
 RESOURCES += \

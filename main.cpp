@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Dialog w;
 //    w.setWindowFlags(w.windowFlags() | Qt::Popup);
-    w.show();
+//    w.show();
+    w.exec();
+//    w.on_pushButton_clicked();
 //    CScreenShotManager manager;
 //    manager.startScreenShot();
 

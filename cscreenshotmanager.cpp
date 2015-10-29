@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QGuiApplication>
 #include "cscreenshotmanager.h"
-#include "cscreenshotview.h"
+#include "CScreenShotDialog.h"
 #include <QDebug>
 #include <QWindowList>
 #include <QWindow>
@@ -32,31 +32,35 @@ void CScreenShotManager::startScreenShot()
 {
     if(m_isRunning)
     {
+        LOG_TEST(QString("screen shot  is runing"))
         return;
     }
     clearAll();
     QList<QScreen *> screens = QApplication::screens();
+    if(screens.isEmpty())
+    {
+        return;
+    }
+    m_isRunning = true;
+    
     int index = 0;
     foreach (QScreen *d, screens)
     {
         index++;
-        CScreenShotView *view = new CScreenShotView(d);
+        CScreenShotDialog *view = new CScreenShotDialog(d);
         m_viewList.append(view);
         connect(view,SIGNAL(sigStatusChanged(CScreenShotStatus)),
                 this,SLOT(onStatusChanged(CScreenShotStatus)));
         connect(view,SIGNAL(sigPreviewItemShow()),
                 this,SLOT(onPreviewItemShow()));
         view->startSCreenShot();
-        view->raise();
     }
-    m_isRunning = true;
 }
 
 void CScreenShotManager::clearAll()
 {
-    //可能为导致crash
     //qDeleteAll(m_viewList);
-    foreach (QGraphicsView *v, m_viewList)
+    foreach (CScreenShotDialog *v, m_viewList)
     {
        v->setVisible(false);
        v->deleteLater();
@@ -66,7 +70,7 @@ void CScreenShotManager::clearAll()
 
 void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
 {
-    CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
+    CScreenShotDialog *view = dynamic_cast<CScreenShotDialog*>(sender());
     if(view == NULL)
     {
         LOG_WARNING(QString("view is NULL"));
@@ -78,8 +82,8 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         pixmap = view->getPixmap();
     }
 
-    CScreenShotView *firstView = NULL;
-    foreach (CScreenShotView *d, m_viewList)
+    CScreenShotDialog *firstView = NULL;
+    foreach (CScreenShotDialog *d, m_viewList)
     {
         if(status == CSCREEN_SHOT_STATE_CANCEL || status == CSCREEN_SHOT_STATE_FINISHED)
         {
@@ -93,6 +97,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
                 d->setVisible(false);
                 d->setWindowState((d->windowState() & ~Qt::WindowActive) | Qt::WindowMinimized);
                 //END=======================
+                d->accept();
 #ifdef Q_OS_WIN
             firstView->setVisible(false);
 #else
@@ -120,6 +125,8 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
              //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
             firstView->setWindowOpacity(0.01);
             firstView->showMinimized();
+            firstView->accept();
+            
 #ifdef Q_OS_WIN
             firstView->setVisible(false);
 #else
@@ -137,13 +144,13 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
 
 void CScreenShotManager::onPreviewItemShow()
 {
-    CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
+    CScreenShotDialog *view = dynamic_cast<CScreenShotDialog*>(sender());
     if(view == NULL)
     {
         LOG_WARNING(QString("view is NULL"));
         return;
     }
-    foreach (CScreenShotView *d, m_viewList)
+    foreach (CScreenShotDialog *d, m_viewList)
     {
         if(d != view)
         {
