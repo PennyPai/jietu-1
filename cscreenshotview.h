@@ -22,13 +22,11 @@ class CScreenShotView : public QGraphicsView
 public:
     CScreenShotView(QScreen *screen,QWidget *parent = 0);
     ~CScreenShotView();
-    void startSCreenShot();
     void setLocked(bool locked);
     QPixmap getPixmap();
     void setPreviewItemHidden(bool isHidden);
 
 protected:
-    bool event(QEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
