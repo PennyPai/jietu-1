@@ -50,7 +50,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     drawPixmap(pixmap);
     m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
-//    this->setGeometry(geometry);
+    this->setGeometry(geometry);
 
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();
@@ -77,6 +77,9 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setStyleSheet("QWidget{border: 0px solid #1880ed;}");
+#ifdef Q_OS_MAC
+    qApp->installEventFilter(this);
+#endif
 }
 
 CScreenShotView::~CScreenShotView()
@@ -88,6 +91,19 @@ CScreenShotView::~CScreenShotView()
         delete m_screen;
         m_screen = NULL;
     }
+}
+
+void CScreenShotView::startSCreenShot()
+{
+//#ifdef Q_OS_WIN
+//    QWidget w;
+//    this->setWindowFlags(w.windowFlags() | Qt::Tool);
+//    this->setWindowModality(Qt::WindowModal);
+//#else
+    this->overrideWindowFlags(Qt::ToolTip);
+//    this->setWindowFlags(Qt::ToolTip);
+//#endif
+    this->showFullScreen();
 }
 
 void CScreenShotView::setLocked(bool locked)
@@ -169,17 +185,44 @@ void CScreenShotView::doFinished()
     }
 }
 
+bool CScreenShotView::event(QEvent *event)
+{
+    if(event->type() == QEvent::KeyPress
+            || event->type() == QEvent::KeyRelease
+            || event->type() == QEvent::MouseButtonDblClick
+            || event->type() == QEvent::MouseButtonPress
+            || event->type() == QEvent::MouseButtonRelease
+            || event->type() == QEvent::MouseMove)
+    {
+        LOG_TEST(QString("EVENT type %1").arg(event->type()));
+    }
+    return QGraphicsView::event(event);
+}
+
 void CScreenShotView::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_Escape)
     {
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
+        return;
+    }
+    else if(event->key() == Qt::Key_Enter
+            || event->key() == Qt::Key_Return)
+    {
+        if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED
+                || m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
+        {
+            doFinished();
+            event->accept();
+            return;
+        }
     }
     if(m_isLocked)
     {
         event->accept();
         return;
     }
+    return QGraphicsView::keyPressEvent(event);
 }
 
 void CScreenShotView::mousePressEvent(QMouseEvent *event)
@@ -396,6 +439,38 @@ void CScreenShotView::leaveEvent(QEvent *event)
 {
     LOG_TEST(QString("leaveEvent "));
     return QGraphicsView::leaveEvent(event);
+}
+
+bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
+{
+#ifdef Q_OS_MAC
+
+    if(/*obj == qApp && */event->type() == QEvent::KeyPress)
+    {
+        LOG_TEST(QString("key is pressed "));
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if(keyEvent)
+        {
+            if(keyEvent->key() == Qt::Key_Escape)
+            {
+                setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
+                event->accept();
+                return true;
+            }
+            else if(keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
+            {
+                if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED
+                        || m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
+                {
+                    doFinished();
+                    event->accept();
+                    return true;
+                }
+            }
+        }
+    }
+#endif
+    return QGraphicsView::eventFilter(obj,event);
 }
 
 CScreenRectItem *CScreenShotView::createRectItem()

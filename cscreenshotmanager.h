@@ -6,7 +6,7 @@
 #include "cscreenpublic.h"
 #include "clogsetting.h"
 
-class CScreenShotDialog;
+class CScreenShotView;
 
 class CScreenShotManager : public QObject
 {
@@ -32,7 +32,7 @@ signals:
 private:
     static CScreenShotManager *m_instance;
     bool m_isRunning;
-    QList<CScreenShotDialog *> m_viewList;
+    QList<CScreenShotView *> m_viewList;
 };
 
 #endif // _CSCREENSHOTMANAGER_H_

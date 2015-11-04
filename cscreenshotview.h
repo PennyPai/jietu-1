@@ -22,17 +22,20 @@ class CScreenShotView : public QGraphicsView
 public:
     CScreenShotView(QScreen *screen,QWidget *parent = 0);
     ~CScreenShotView();
+    void startSCreenShot();
     void setLocked(bool locked);
     QPixmap getPixmap();
     void setPreviewItemHidden(bool isHidden);
 
 protected:
+    bool event(QEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void leaveEvent(QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
     CScreenRectItem *createRectItem();
 
 private:
@@ -81,7 +84,6 @@ private:
     qreal m_sy;
     QRectF m_selectRect;
     QPixmap m_pixmap;
-//    QList<QGraphicsRectItem*> m_editorItemList;
     static const int m_marginSelectedWidthToolbar = 4;
     static const int m_marginSelectedWidthTooltip = 4;
     static const int m_minSelectSize = 1;
