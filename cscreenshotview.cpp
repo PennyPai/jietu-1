@@ -445,7 +445,7 @@ bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
 {
 #ifdef Q_OS_MAC
 
-    if(/*obj == qApp && */event->type() == QEvent::KeyPress)
+    if(/*obj == qApp && */event->type() == QEvent::KeyPress || this->isVisible())
     {
         LOG_TEST(QString("key is pressed "));
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
