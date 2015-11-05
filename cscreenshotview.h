@@ -34,7 +34,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    void leaveEvent(QEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     CScreenRectItem *createRectItem();
 

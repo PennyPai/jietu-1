@@ -95,14 +95,7 @@ CScreenShotView::~CScreenShotView()
 
 void CScreenShotView::startSCreenShot()
 {
-//#ifdef Q_OS_WIN
-//    QWidget w;
-//    this->setWindowFlags(w.windowFlags() | Qt::Tool);
-//    this->setWindowModality(Qt::WindowModal);
-//#else
     this->overrideWindowFlags(Qt::ToolTip);
-//    this->setWindowFlags(Qt::ToolTip);
-//#endif
     this->showFullScreen();
 }
 
@@ -270,6 +263,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
                 m_screen->addItem(m_currentRectItem);
             }
         }
+
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             updatePreviewItem(event->pos());
@@ -359,6 +353,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         event->accept();
         return;
     }
+    LOG_TEST(QString("move"));
     if((event->buttons() & Qt::LeftButton) && m_isPressed)
     {
         m_selectRectItem->setVisible(true);
@@ -435,19 +430,12 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
     return QGraphicsView::mouseMoveEvent(event);
 }
 
-void CScreenShotView::leaveEvent(QEvent *event)
-{
-    LOG_TEST(QString("leaveEvent "));
-    return QGraphicsView::leaveEvent(event);
-}
-
 bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
 {
 #ifdef Q_OS_MAC
 
     if(/*obj == qApp && */event->type() == QEvent::KeyPress || this->isVisible())
     {
-        LOG_TEST(QString("key is pressed "));
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if(keyEvent)
         {
@@ -469,6 +457,7 @@ bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
             }
         }
     }
+
 #endif
     return QGraphicsView::eventFilter(obj,event);
 }
