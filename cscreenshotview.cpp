@@ -180,6 +180,7 @@ void CScreenShotView::doFinished()
 
 bool CScreenShotView::event(QEvent *event)
 {
+#ifdef Q_OS_MAC
     if(event->type() == QEvent::KeyPress
             || event->type() == QEvent::KeyRelease
             || event->type() == QEvent::MouseButtonDblClick
@@ -188,15 +189,35 @@ bool CScreenShotView::event(QEvent *event)
             || event->type() == QEvent::MouseMove)
     {
         LOG_TEST(QString("EVENT type %1").arg(event->type()));
+        if(event->type() == QEvent::MouseMove)
+        {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent)
+            {
+                mouseMoveEvent(mouseEvent);
+                event->accept();
+                return true;
+            }
+        }
+        if(event->type() == QEvent::MouseButtonRelease)
+        {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            mouseReleaseEvent(mouseEvent);
+            event->accept();
+            return true;
+        }
     }
+#endif
     return QGraphicsView::event(event);
 }
+
 
 void CScreenShotView::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_Escape)
     {
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
+        event->accept();
         return;
     }
     else if(event->key() == Qt::Key_Enter
@@ -353,7 +374,6 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-    LOG_TEST(QString("move"));
     if((event->buttons() & Qt::LeftButton) && m_isPressed)
     {
         m_selectRectItem->setVisible(true);
@@ -457,7 +477,38 @@ bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
             }
         }
     }
-
+    if(this->isVisible())
+    {
+        //弥补界面最下面、最右边差1px的事件范围
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent && m_desktopScreen)
+        {
+            QPoint globalPos = mouseEvent->globalPos();
+            QRect geometry = m_desktopScreen->geometry();
+            bool isContains = globalPos.x() >= geometry.x()
+                    && globalPos.x() <= (geometry.x() + geometry.width())
+                    && globalPos.y() >= geometry.y()
+                    && globalPos.y() <= (geometry.y() + geometry.height());
+            bool onBoundary = (globalPos.x() == (geometry.x() + geometry.width()) || globalPos.y() == (geometry.y() + geometry.height()));
+            if(isContains && onBoundary)
+            {
+                switch (event->type())
+                {
+                case QEvent::MouseButtonPress:
+                    mousePressEvent(mouseEvent);
+                    break;
+                case QEvent::MouseMove:
+                    mouseMoveEvent(mouseEvent);
+                    break;
+                case QEvent::MouseButtonDblClick:
+                    mouseDoubleClickEvent(mouseEvent);
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
 #endif
     return QGraphicsView::eventFilter(obj,event);
 }
@@ -651,15 +702,11 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
         y = pos.y() - m_previewItemDy - pixmap.height();
     }
     m_previewItem->setPos(x,y);
-
-    //暂时只支持win
-#ifdef Q_OS_WIN
     if(!m_previewItem->isVisible())
     {
         emit sigPreviewItemShow();
         m_previewItem->setVisible(true);
     }
-#endif
 }
 
 void CScreenShotView::setShotStatus(CScreenShotStatus status)
