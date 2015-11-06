@@ -139,7 +139,7 @@ QPixmap CScreenShotView::createPixmap(const QRect &rect)
                  .arg(geometry.height()));
 
         QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
-                                            ,geometry.y(),geometry.width(),geometry.height());
+                                                            ,geometry.y(),geometry.width(),geometry.height());
 
         pixmap = desktopPixmap.copy(rect);
         QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
@@ -269,7 +269,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
         m_selectRect = m_selectRectItem->getSelectRect();
         bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
         if((isContains
-                && m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
+            && m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
                 || m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             m_isPressed = true;
@@ -313,22 +313,13 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
     if(m_isPressed)
     {
         QRectF selectRect = m_selectRectItem->getSelectRect();
-//        qreal minSelectSize = m_minSelectSize / m_sx;
-//        bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             updateToolbarPosition();
-//            if(visible)
-            {
-                m_selectRect = selectRect;
-                setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
-                m_previewItem->setVisible(false);
-            }
-//            else
-//            {
-//                m_selectRectItem->setSelectedRect(QRectF(0,0,0,0));
-//                updatePreviewItem(event->pos());
-//            }
+            m_selectRect = selectRect;
+            setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
+            m_previewItem->setVisible(false);
+
             m_selectRectItem->setVisible(true);
             m_toolbarItem->setVisible(true);
         }
@@ -622,9 +613,9 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
     QPainter painter(&pixmap);
     painter.setRenderHints(QPainter::TextAntialiasing
                            | QPainter::SmoothPixmapTransform
-                            | QPainter::HighQualityAntialiasing
-                            | QPainter::NonCosmeticDefaultPen
-                            | QPainter::Qt4CompatiblePainting);
+                           | QPainter::HighQualityAntialiasing
+                           | QPainter::NonCosmeticDefaultPen
+                           | QPainter::Qt4CompatiblePainting);
     QPointF toItemPos = getPointToSelectedItem(pos);
 
     qreal scaleSize = 3;

@@ -87,7 +87,6 @@ private:
     QPixmap m_pixmap;
     static const int m_marginSelectedWidthToolbar = 4;
     static const int m_marginSelectedWidthTooltip = 4;
-    static const int m_minSelectSize = 1;
     static const int m_previewItemWidth = 101;
     static const int m_previewItemPixmapHeight = 83;
     static const int m_previewItemTextHeight = 32;
