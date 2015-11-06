@@ -81,6 +81,12 @@ CScreenShotView::CScreenShotView(QScreen *screen,
 #ifdef Q_OS_MAC
     qApp->installEventFilter(this);
 #endif
+    QPoint pos = QCursor::pos();
+    if(geometry.contains(pos))
+    {
+        updatePreviewItem(this->mapFromGlobal(pos));
+    }
+
 }
 
 CScreenShotView::~CScreenShotView()
@@ -266,6 +272,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
             return QGraphicsView::mousePressEvent(event);
         }
         m_startPoint = event->pos();
+        m_endPoint = event->pos();
         m_selectRect = m_selectRectItem->getSelectRect();
         bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
         if((isContains
@@ -310,9 +317,9 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
-    if(m_isPressed)
+    QRectF selectRect = m_selectRectItem->getSelectRect();
+    if(m_isPressed && (selectRect.width() > 1 || selectRect.height() > 1))
     {
-        QRectF selectRect = m_selectRectItem->getSelectRect();
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             updateToolbarPosition();
