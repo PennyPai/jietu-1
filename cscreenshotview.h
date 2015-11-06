@@ -25,6 +25,7 @@ public:
     void startSCreenShot();
     void setLocked(bool locked);
     QPixmap getPixmap();
+    bool isValid() const;
     void setPreviewItemHidden(bool isHidden);
 
 protected:
@@ -41,12 +42,12 @@ private:
     void drawPixmap(const QPixmap &pixmap);
     QPointF getPointToSelectedItem(const QPointF &point);
     QPointF getPointFromSelectedItem(const QPointF &point);
-    QRect getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
+    QRectF getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
     void updateToolbarPosition();
     void updateTooltipItem();
     void updatePreviewItem(const QPoint &pos);
     void setShotStatus(CScreenShotStatus status);
-    QPixmap createPixmap();
+    QPixmap createPixmap(const QRect &rect);
     QString getSizeString(const QSize &size) const;
     QRgb getPixmapPosRgb(const QPixmap &pixmap,const QPoint &pos);
     void doFinished();
@@ -75,6 +76,7 @@ private:
     //====
     bool m_isPressed;
     bool m_isLocked;
+    bool m_isValid;
     QPoint m_startPoint;
     QPoint m_endPoint;
     QPixmap m_backgroundPixmap;

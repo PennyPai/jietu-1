@@ -73,9 +73,11 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         return;
     }
     QPixmap pixmap;
+    bool isValid = false;
     if(status == CSCREEN_SHOT_STATE_FINISHED)
     {
         pixmap = view->getPixmap();
+        isValid = view->isValid();
     }
 
     CScreenShotView *firstView = NULL;
@@ -127,7 +129,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             m_viewList.clear();
 #endif
         }
-        if(status == CSCREEN_SHOT_STATE_FINISHED)
+        if(status == CSCREEN_SHOT_STATE_FINISHED && !pixmap.isNull() && isValid)
         {
             emit sigScreenShotPixmapChanged(pixmap);
         }

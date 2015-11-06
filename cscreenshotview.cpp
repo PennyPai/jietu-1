@@ -33,6 +33,7 @@ CScreenShotView::CScreenShotView(QScreen *screen,
     ,m_shotStatus(CSCREEN_SHOT_STATE_INITIALIZED)
     ,m_isPressed(false)
     ,m_isLocked(false)
+    ,m_isValid(false)
 {
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
@@ -113,19 +114,22 @@ QPixmap CScreenShotView::getPixmap()
     return m_pixmap;
 }
 
+bool CScreenShotView::isValid() const
+{
+    return m_isValid;
+}
+
 void CScreenShotView::setPreviewItemHidden(bool isHidden)
 {
     m_previewItem->setVisible(!isHidden);
 }
 
-QPixmap CScreenShotView::createPixmap()
+QPixmap CScreenShotView::createPixmap(const QRect &rect)
 {
     QPixmap pixmap;
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
-        QPointF startPos = m_selectRectItem->getSelectRect().topLeft();
-        QPointF endPos = m_selectRectItem->getSelectRect().bottomRight();
-        QRect rect = getPositiveRect(startPos,endPos);
+
         QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
         LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
@@ -309,29 +313,29 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
     if(m_isPressed)
     {
         QRectF selectRect = m_selectRectItem->getSelectRect();
-        qreal minSelectSize = m_minSelectSize / m_sx;
-        bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
+//        qreal minSelectSize = m_minSelectSize / m_sx;
+//        bool visible = selectRect.width() >= minSelectSize && selectRect.height() >= minSelectSize;
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             updateToolbarPosition();
-            if(visible)
+//            if(visible)
             {
                 m_selectRect = selectRect;
                 setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
                 m_previewItem->setVisible(false);
             }
-            else
-            {
-                m_selectRectItem->setSelectedRect(QRectF(0,0,0,0));
-                updatePreviewItem(event->pos());
-            }
-            m_selectRectItem->setVisible(visible);
-            m_toolbarItem->setVisible(visible);
+//            else
+//            {
+//                m_selectRectItem->setSelectedRect(QRectF(0,0,0,0));
+//                updatePreviewItem(event->pos());
+//            }
+            m_selectRectItem->setVisible(true);
+            m_toolbarItem->setVisible(true);
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
             updateToolbarPosition();
-            m_toolbarItem->setVisible(visible);
+            m_toolbarItem->setVisible(true);
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
         {
@@ -400,12 +404,10 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
                 endPoint.setY(0);
             }
 
-            QRect rect = getPositiveRect(startPoint,endPoint);
-            if(rect.width() > m_minSelectSize && rect.height() > m_minSelectSize)
-            {
-                m_selectRectItem->setSelectedRect(rect);
-                updateTooltipItem();
-            }
+            QRectF rect = getPositiveRect(startPoint,endPoint);
+
+            m_selectRectItem->setSelectedRect(rect);
+            updateTooltipItem();
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
@@ -438,7 +440,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED && m_currentRectItem)
         {
-            QRect rect = getPositiveRect(m_startPoint,event->pos());
+            QRectF rect = getPositiveRect(m_startPoint,event->pos());
             m_currentRectItem->setPainterRect(rect);
             m_currentRectItem->setVisible(true);
         }
@@ -517,7 +519,7 @@ CScreenRectItem *CScreenShotView::createRectItem()
 {
     QPointF topLeftPos = getPointFromSelectedItem(m_selectRect.topLeft());
     QPointF bottomRightPos = getPointFromSelectedItem(m_selectRect.bottomRight());
-    QRect rect = getPositiveRect(topLeftPos,bottomRightPos);
+    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
     CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
     item->setLineColor(m_toolbarItem->getColor());
     item->setLineWidth(m_toolbarItem->getLineWidth());
@@ -543,11 +545,11 @@ QPointF CScreenShotView::getPointFromSelectedItem(const QPointF &point)
     return QPointF(point.x() * m_sx,point.y() * m_sy);
 }
 
-QRect CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF &endPoint)
+QRectF CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF &endPoint)
 {
     qreal width = endPoint.x() - startPoint.x();
     qreal height = endPoint.y() - startPoint.y();
-    QPoint pos;
+    QPointF pos;
     if(width > 0)
     {
         pos.setX(startPoint.x());
@@ -564,8 +566,8 @@ QRect CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF 
     {
         pos.setY(endPoint.y());
     }
-    QSize size(qAbs(width),qAbs(height));
-    return QRect(pos,size);
+    QSizeF size(qAbs(width),qAbs(height));
+    return QRectF(pos,size);
 }
 
 void CScreenShotView::updateToolbarPosition()
@@ -743,8 +745,19 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
 
 void CScreenShotView::onFinishTimerOut()
 {
-    m_pixmap = createPixmap();
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setPixmap(m_pixmap);
+    QPointF startPos = m_selectRectItem->getSelectRect().topLeft();
+    QPointF endPos = m_selectRectItem->getSelectRect().bottomRight();
+    QRect rect = getPositiveRect(startPos,endPos).toRect();
+    if(rect.width() > 1)
+    {
+        m_isValid = true;
+        m_pixmap = createPixmap(rect);
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setPixmap(m_pixmap);
+    }
+    else
+    {
+        m_isValid = false;
+    }
     setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
 }
