@@ -46,15 +46,12 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
              .arg(geometry.y())
              .arg(geometry.width())
              .arg(geometry.height()));
-    
     QPixmap pixmap = screen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                         ,geometry.y(),geometry.width(),geometry.height());
-    
     drawPixmap(pixmap);
     m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
     this->setGeometry(geometry);
-    
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();
     m_sy = 1.0 * geometry.height() / pixmap.height();
@@ -88,7 +85,6 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     {
         updatePreviewItem(this->mapFromGlobal(pos));
     }
-    
 }
 
 CScreenShotView::~CScreenShotView()
@@ -137,7 +133,6 @@ QPixmap CScreenShotView::createPixmap(const QRect &rect)
     QPixmap pixmap;
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
-        
         QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
         LOG_TEST(QString("screen->geometry() (%1,%2,%3,%4)")
@@ -145,10 +140,8 @@ QPixmap CScreenShotView::createPixmap(const QRect &rect)
                  .arg(geometry.y())
                  .arg(geometry.width())
                  .arg(geometry.height()));
-        
         QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                                             ,geometry.y(),geometry.width(),geometry.height());
-        
         pixmap = desktopPixmap.copy(rect);
         QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
                 .append(QString("/shotscreenimages/%1.png").arg(QUuid::createUuid().toString()));
@@ -340,12 +333,10 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
                 m_screen->addItem(m_currentRectItem);
             }
         }
-        
         if(m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
         {
             updatePreviewItem(event->pos());
         }
-        
     }
     else
     {
@@ -361,7 +352,6 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-    
     QRectF selectRect = m_selectRectItem->getSelectRect();
     if(m_isPressed && (selectRect.width() >= 1 && selectRect.height() >= 1))
     {
@@ -371,7 +361,6 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             m_selectRect = selectRect;
             setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
             m_previewItem->setVisible(false);
-            
             m_selectRectItem->setVisible(true);
             m_toolbarItem->setVisible(true);
         }
@@ -415,7 +404,6 @@ void CScreenShotView::mouseDoubleClickEvent(QMouseEvent *event)
             return;
         }
     }
-    
     return QGraphicsView::mouseDoubleClickEvent(event);
 }
 
@@ -451,9 +439,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             {
                 endPoint.setY(0);
             }
-            
             QRectF rect = getPositiveRect(startPoint,endPoint);
-            
             m_selectRectItem->setSelectedRect(rect);
             updateTooltipItem();
         }
@@ -473,7 +459,6 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             {
                 x = maxX;
             }
-            
             if(y < 0)
             {
                 y = 0;
@@ -515,7 +500,6 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
 bool CScreenShotView::eventFilter(QObject *obj, QEvent *event)
 {
 #ifdef Q_OS_MAC
-    
     if(/*obj == qApp && */event->type() == QEvent::KeyPress || this->isVisible())
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -686,10 +670,9 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
                            | QPainter::NonCosmeticDefaultPen
                            | QPainter::Qt4CompatiblePainting);
     QPointF toItemPos = getPointToSelectedItem(pos);
-    
+
     qreal scaleSize = 3;
     {//draw preview
-        
         qreal width = m_previewItemWidth / scaleSize;
         qreal height = m_previewItemPixmapHeight / scaleSize;
         qreal x = (toItemPos.x() - 0.5 * width);
@@ -727,7 +710,6 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
         QLineF vLine(0.5 * m_previewItemWidth,0,0.5 * m_previewItemWidth,m_previewItemPixmapHeight);
         painter.drawLine(vLine);
     }
-    
     QRectF textRect(0,m_previewItemPixmapHeight,m_previewItemWidth,m_previewItemTextHeight);
     {//draw text background
         QBrush textBrush(QColor("#4F4F4F"));
