@@ -44,6 +44,7 @@ enum CScreenArrowDirection
     CSCREEN_ARROW_DIRECTION_DOWN,
 };
 
+// 获取窗口矩形列表
 QList<QRect> getWindownRectList();
 
 #endif // _CSCREENPUBLIC_H_

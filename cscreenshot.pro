@@ -13,7 +13,7 @@ OBJECTIVE_SOURCES += \
 }
 
 win32 {
-#SOURCES += cscreenpublic.cpp
+SOURCES += cscreenpublic.cpp
 }
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
