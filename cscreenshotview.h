@@ -20,7 +20,7 @@ class CScreenShotView : public QGraphicsView
     LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
-    CScreenShotView(QScreen *screen,QWidget *parent = 0);
+    CScreenShotView(const QList<QRect> &rectList,QScreen *screen,QWidget *parent = 0);
     ~CScreenShotView();
     void startSCreenShot();
     void setLocked(bool locked);
@@ -51,6 +51,9 @@ private:
     QString getSizeString(const QSize &size) const;
     QRgb getPixmapPosRgb(const QPixmap &pixmap,const QPoint &pos);
     void doFinished();
+    
+    QRect getMouseOnWindowRect(const QPoint &pos);
+    int getRectDistance(const QRect &rect, const QPoint &pos);
 
 private slots:
     void onButtonClicked(CScreenButtonType type);
@@ -61,6 +64,7 @@ signals:
     void sigPreviewItemShow();
 
 private:
+    QList<QRect> m_windowRectList;
     QScreen *m_desktopScreen;
     CScreenShotScene *m_screen;
     QGraphicsPixmapItem *m_backgroundItem;
