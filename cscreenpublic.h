@@ -1,6 +1,9 @@
 #ifndef _CSCREENPUBLIC_H_
 #define _CSCREENPUBLIC_H_
 
+#include <QRect>
+#include <QList>
+
 #define C_SCREEN_ZERO  0.000000001
 
 enum CScreenShotStatus
@@ -40,6 +43,8 @@ enum CScreenArrowDirection
     CSCREEN_ARROW_DIRECTION_UP,
     CSCREEN_ARROW_DIRECTION_DOWN,
 };
+
+QList<QRect> getWindownRectList();
 
 #endif // _CSCREENPUBLIC_H_
 

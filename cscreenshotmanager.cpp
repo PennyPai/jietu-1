@@ -2,6 +2,7 @@
 #include <QGuiApplication>
 #include "cscreenshotmanager.h"
 #include "cscreenshotview.h"
+#include "cscreenpublic.h"
 #include <QDebug>
 #include <QWindowList>
 #include <QWindow>
@@ -69,8 +70,11 @@ void CScreenShotManager::startScreenShot()
     c_global_windown_rect_list.clear();
     //遍历所有顶级窗口,更新窗口大小列表
     ::EnumWindows((WNDENUMPROC)getWindownRect,0);
+#elif defined Q_OS_MAC
+    c_global_windown_rect_list = getWindownRectList();
 #endif
     LOG_TEST(QString("all rect count %1").arg(c_global_windown_rect_list.count()));
+
     foreach (QScreen *d, screens)
     {
         index++;

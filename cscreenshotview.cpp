@@ -499,10 +499,13 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         if(!m_isPressed && !m_windowRectList.isEmpty())
         {
             QRect rect = getMouseOnWindowRect(event->globalPos());
-            if(rect.isValid())
+            QPointF topLeft = getPointToSelectedItem(rect.topLeft());
+            QPointF bottomRight = getPointToSelectedItem(rect.bottomRight());
+            QRectF selectRect(topLeft,bottomRight);
+            if(selectRect.isValid())
             {
                 m_selectRectItem->setVisible(true);
-                m_selectRectItem->setSelectedRect(rect);
+                m_selectRectItem->setSelectedRect(selectRect);
             }
         }
     }

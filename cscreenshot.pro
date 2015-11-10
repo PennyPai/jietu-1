@@ -7,6 +7,13 @@
 QT       += core gui
 mac{
 QT += macextras
+QMAKE_LFLAGS += -framework AppKit
+OBJECTIVE_SOURCES += \
+    cscreenpublic.mm
+}
+
+win32 {
+#SOURCES += cscreenpublic.cpp
 }
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -44,3 +51,4 @@ HEADERS  += dialog.h \
 FORMS    += dialog.ui
 RESOURCES += \
     source.qrc
+
