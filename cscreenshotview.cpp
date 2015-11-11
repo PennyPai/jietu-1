@@ -5,18 +5,14 @@
 #include <QClipboard>
 #include <QTimer>
 #include <QRgb>
+#include <QDesktopWidget>
+#include <QApplication>
 #include "cscreenshotview.h"
 #include "cscreenshotscene.h"
 #include "cscreenselectrectitem.h"
 #include "cscreeneditortoolbaritem.h"
 #include "cscreenrectitem.h"
 #include "cscreentooltipitem.h"
-
-#include <QUuid>
-#include <QStandardPaths>
-#include <QDebug>
-#include <QDesktopWidget>
-#include <QApplication>
 
 CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
                                  QScreen *screen,
@@ -143,9 +139,6 @@ QPixmap CScreenShotView::createPixmap(const QRect &rect)
         QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                                             ,geometry.y(),geometry.width(),geometry.height());
         pixmap = desktopPixmap.copy(rect);
-        QString fileName = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
-                .append(QString("/shotscreenimages/%1.png").arg(QUuid::createUuid().toString()));
-        pixmap.save(fileName);
     }
     return pixmap;
 }
@@ -176,6 +169,7 @@ void CScreenShotView::doFinished()
 {
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
+        m_selectRectItem->setMovePointHidden(true);
         m_toolbarItem->setVisible(false);
         m_tooltipSizeItem->setVisible(false);
         //延迟获取图片，否则工具栏可能不消失
@@ -291,6 +285,8 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::RightButton)
     {
+        CScreenPositionType type = m_selectRectItem->getPostionType(getPointToSelectedItem(event->pos()));
+        LOG_TEST(QString("RightButton pos x %1,y %2,type %3").arg(event->pos().x()).arg(event->pos().y()).arg(type));
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
         return;
     }
@@ -312,7 +308,9 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
         m_startPoint = event->pos();
         m_endPoint = event->pos();
         m_selectRect = m_selectRectItem->getSelectRect();
-        bool isContains = m_selectRect.contains(getPointToSelectedItem(event->pos()));
+        m_positionType = m_selectRectItem->getPostionType(getPointToSelectedItem(event->pos()));
+        LOG_TEST(QString("m_positionType %1").arg(m_positionType));
+        bool isContains = (m_positionType != CSCREEN_POSITION_TYPE_NOT_CONTAIN);
         if((isContains
             && m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
                 || m_shotStatus == CSCREEN_SHOT_STATE_INITIALIZED)
@@ -362,6 +360,7 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             setShotStatus(CSCREEN_SHOT_STATE_SELECTED);
             m_previewItem->setVisible(false);
             m_selectRectItem->setVisible(true);
+            m_selectRectItem->setMovePointHidden(false);
             m_toolbarItem->setVisible(true);
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
@@ -445,31 +444,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
-            qreal dx = startPoint.x() - endPoint.x();
-            qreal dy = startPoint.y() - endPoint.y();
-            qreal x = -dx + m_selectRect.x();
-            qreal y = -dy + m_selectRect.y();
-            qreal maxX = maxPoint.x() - m_selectRect.width();
-            qreal maxY = maxPoint.y() - m_selectRect.height();
-            if(x < 0)
-            {
-                x = 0;
-            }
-            else if(x > maxX)
-            {
-                x = maxX;
-            }
-            if(y < 0)
-            {
-                y = 0;
-            }
-            else if(y >  maxY)
-            {
-                y = maxY;
-            }
-            QRectF rect(x,y,m_selectRect.width(),m_selectRect.height());
-            m_selectRectItem->setSelectedRect(rect);
-            updateTooltipItem();
+            updateSelectRect(startPoint,endPoint);
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED && m_currentRectItem)
         {
@@ -494,6 +469,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             }
         }
     }
+
     return QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -760,6 +736,107 @@ void CScreenShotView::setShotStatus(CScreenShotStatus status)
         m_shotStatus = status;
         emit sigStatusChanged(m_shotStatus);
     }
+}
+
+void CScreenShotView::updateSelectRect(const QPointF &startPoint, const QPointF &endPoint)
+{
+    QPointF maxPoint = getPointToSelectedItem(QPointF(this->geometry().width(),this->geometry().height()));
+    qreal dx = startPoint.x() - endPoint.x();
+    qreal dy = startPoint.y() - endPoint.y();
+    qreal maxX = maxPoint.x();
+    qreal maxY = maxPoint.y();
+    QPointF topLeft;
+    QPointF bottomRight;
+    switch (m_positionType)
+    {
+    case CSCREEN_POSITION_TYPE_TOP_LEFT:
+        bottomRight = m_selectRect.bottomRight();
+        topLeft = m_selectRect.topLeft() - QPointF(dx,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_TOP_MIDDLE:
+        bottomRight = m_selectRect.bottomRight();
+        topLeft = m_selectRect.topLeft() - QPointF(0,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_LEFT_MIDDLE:
+        bottomRight = m_selectRect.bottomRight();
+        topLeft = m_selectRect.topLeft() - QPointF(dx,0);
+        break;
+    case CSCREEN_POSITION_TYPE_TOP_RIGHT:
+        bottomRight = m_selectRect.bottomLeft();
+        topLeft = m_selectRect.topRight() - QPointF(dx,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_RIGHT_MIDDLE:
+        bottomRight = m_selectRect.bottomLeft();
+        topLeft = m_selectRect.topRight() - QPointF(dx,0);
+        break;
+    case CSCREEN_POSITION_TYPE_BOTTOM_LEFT:
+        bottomRight = m_selectRect.topRight();
+        topLeft = m_selectRect.bottomLeft() - QPointF(dx,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_BOTTOM_MIDDLE:
+        bottomRight = m_selectRect.topRight();
+        topLeft = m_selectRect.bottomLeft() - QPointF(0,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_BOTTOM_RIGHT:
+        bottomRight = m_selectRect.topLeft();
+        topLeft = m_selectRect.bottomRight() - QPointF(dx,dy);
+        break;
+    case CSCREEN_POSITION_TYPE_CONTAIN:
+    {
+        bottomRight = m_selectRect.topLeft() - QPointF(dx,dy);
+        topLeft = m_selectRect.bottomRight() - QPointF(dx,dy);
+        qreal x = m_selectRect.x() - dx;
+        x = qMax(x,0.0);
+        x = qMin(x,maxX - m_selectRect.width());
+        qreal y = m_selectRect.y() - dy;
+        y = qMax(y,0.0);
+        y = qMin(y,maxY - m_selectRect.height());
+        QRectF rect(x,y,m_selectRect.width(),m_selectRect.height());
+        m_selectRectItem->setSelectedRect(rect);
+        updateTooltipItem();
+        return;
+        break;
+    }
+    default:
+        return;
+        break;
+    }
+    if(topLeft.x() < 0)
+    {
+        topLeft.setX(0);
+    }
+    else if(topLeft.x() > maxX)
+    {
+        topLeft.setX(maxX);
+    }
+    if(topLeft.y() < 0)
+    {
+        topLeft.setY(0);
+    }
+    else if(topLeft.y() > maxY)
+    {
+        topLeft.setY(maxY);
+    }
+    if(bottomRight.x() < 0)
+    {
+        bottomRight.setX(0);
+    }
+    else if(bottomRight.x() > maxX)
+    {
+        bottomRight.setX(maxX);
+    }
+    if(bottomRight.y() < 0)
+    {
+        bottomRight.setY(0);
+    }
+    else if(bottomRight.y() > maxY)
+    {
+        bottomRight.setY(maxY);
+    }
+
+    QRectF rect = getPositiveRect(topLeft,bottomRight);
+    m_selectRectItem->setSelectedRect(rect);
+    updateTooltipItem();
 }
 
 void CScreenShotView::onButtonClicked(CScreenButtonType type)

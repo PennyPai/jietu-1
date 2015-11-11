@@ -3,6 +3,7 @@
 
 #include <QGraphicsRectItem>
 #include "clogsetting.h"
+#include "cscreenpublic.h"
 
 class CScreenSelectRectItem : public QGraphicsRectItem
 {
@@ -12,6 +13,8 @@ public:
     void setScale(qreal scale);
     ~CScreenSelectRectItem();
     QRectF getSelectRect() const;
+    void setMovePointHidden(bool hidden);
+    CScreenPositionType getPostionType(const QPointF &pos);
 
 protected:
     //TODO ==START== 为后期选择移动准备
@@ -37,6 +40,7 @@ private:
     QGraphicsEllipseItem *m_bottomRightEllipseItem;
     QGraphicsEllipseItem *m_leftMiddleEllipseItem;
     QGraphicsEllipseItem *m_rightMiddleEllipseItem;
+    bool m_movePointHidden;
     //TODO ==END== 为后期选择移动准备
     QPixmap m_desktopPixmap;
     QColor m_penColor;

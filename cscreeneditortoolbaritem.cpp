@@ -64,6 +64,8 @@ QRectF CScreenEditorToolbarItem::boundingRect() const
 
 void CScreenEditorToolbarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     painter->drawImage(m_rect,QImage(":/screenshot/res/screenshot/toolbarbg.png"));
 }
 

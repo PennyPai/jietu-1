@@ -29,6 +29,9 @@ QRectF CScreenEditorButtonItem::boundingRect() const
 
 void CScreenEditorButtonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    painter->save();
     QPen pen(Qt::NoPen);
     painter->setPen(pen);
     if(m_isPressed)
@@ -46,7 +49,7 @@ void CScreenEditorButtonItem::paint(QPainter *painter, const QStyleOptionGraphic
         painter->drawImage(m_rect,m_imageNormalBackground);
         painter->drawImage(m_rect,m_imageNormal);
     }
-
+    painter->restore();
 }
 
 void CScreenEditorButtonItem::setSelected(bool isSelected)

@@ -24,6 +24,8 @@ QRectF CScreenRectItem::boundingRect() const
 
 void CScreenRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     painter->save();
     QImage image = createBackgroupdPixmap().toImage();
     painter->drawImage(m_rect.left(),m_rect.top(),image);

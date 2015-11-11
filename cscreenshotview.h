@@ -47,6 +47,7 @@ private:
     void updateTooltipItem();
     void updatePreviewItem(const QPoint &pos);
     void setShotStatus(CScreenShotStatus status);
+    void updateSelectRect(const QPointF &startPoint,const QPointF &endPoint);
     QPixmap createPixmap(const QRect &rect);
     QString getSizeString(const QSize &size) const;
     QRgb getPixmapPosRgb(const QPixmap &pixmap,const QPoint &pos);

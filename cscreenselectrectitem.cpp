@@ -14,6 +14,7 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
     , m_bottomRightEllipseItem(NULL)
     , m_leftMiddleEllipseItem(NULL)
     , m_rightMiddleEllipseItem(NULL)
+    , m_movePointHidden(true)
     , m_desktopPixmap(desktopPixmap)
     , m_penColor(QColor("#00ACFF"))
     , m_rect(0,0,0,0)
@@ -67,6 +68,116 @@ QRectF CScreenSelectRectItem::getSelectRect() const
     return m_rect;
 }
 
+void CScreenSelectRectItem::setMovePointHidden(bool hidden)
+{
+    if(m_movePointHidden == hidden)
+    {
+        return;
+    }
+    m_movePointHidden = hidden;
+    if(m_topLeftEllipseItem)
+    {
+        m_topLeftEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_bottomLeftEllipseItem)
+    {
+        m_bottomLeftEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_topMiddleEllipseItem)
+    {
+        m_topMiddleEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_bottomMiddleEllipseItem)
+    {
+        m_bottomMiddleEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_topRightEllipseItem)
+    {
+        m_topRightEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_bottomRightEllipseItem)
+    {
+        m_bottomRightEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_leftMiddleEllipseItem)
+    {
+        m_leftMiddleEllipseItem->setVisible(!m_movePointHidden);
+    }
+    if(m_rightMiddleEllipseItem)
+    {
+        m_rightMiddleEllipseItem->setVisible(!m_movePointHidden);
+    }
+    update();
+}
+
+CScreenPositionType CScreenSelectRectItem::getPostionType(const QPointF &pos)
+{
+    if(!m_movePointHidden)
+    {
+        if(m_topLeftEllipseItem)
+        {
+            if(m_topLeftEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_TOP_LEFT;
+            }
+        }
+        if(m_bottomLeftEllipseItem)
+        {
+            if(m_bottomLeftEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_BOTTOM_LEFT;
+            }
+        }
+        if(m_topMiddleEllipseItem)
+        {
+            if(m_topMiddleEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_TOP_MIDDLE;
+            }
+        }
+        if(m_bottomMiddleEllipseItem)
+        {
+            if(m_bottomMiddleEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_BOTTOM_MIDDLE;
+            }
+        }
+        if(m_topRightEllipseItem)
+        {
+            if(m_topRightEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_TOP_RIGHT;
+            }
+        }
+        if(m_bottomRightEllipseItem)
+        {
+            if(m_bottomRightEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_BOTTOM_RIGHT;
+            }
+        }
+        if(m_leftMiddleEllipseItem)
+        {
+            if(m_leftMiddleEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_LEFT_MIDDLE;
+            }
+        }
+        if(m_rightMiddleEllipseItem)
+        {
+            if(m_rightMiddleEllipseItem->rect().contains(pos))
+            {
+                return CSCREEN_POSITION_TYPE_RIGHT_MIDDLE;
+            }
+        }
+    }
+    if(m_rect.contains(pos))
+    {
+        return CSCREEN_POSITION_TYPE_CONTAIN;
+    }
+    return CSCREEN_POSITION_TYPE_NOT_CONTAIN;
+}
+
 void CScreenSelectRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     return QGraphicsRectItem::mousePressEvent(event);
@@ -87,14 +198,14 @@ QGraphicsEllipseItem *CScreenSelectRectItem::createEllipseItem(const QRectF &rec
     QGraphicsEllipseItem *item = new QGraphicsEllipseItem(this);
     item->setZValue(this->zValue() + 1);
     item->setRect(rect);
-    QColor color(Qt::white);
+    QColor color("#c9f6ff");
+    color.setAlpha(128);
     QPen pen(color);
     pen.setWidth(1);
     item->setPen(pen);
-    QBrush brush(color);
+    QBrush brush(Qt::white);
     item->setBrush(brush);
-    //TODO
-    item->setVisible(false);
+    item->setVisible(!m_movePointHidden);
     return item;
 }
 
@@ -138,7 +249,7 @@ void CScreenSelectRectItem::updateEllipseItems()
 
 void CScreenSelectRectItem::updateEllipseItem(QGraphicsEllipseItem **item, const QRectF &rect)
 {
-    if(((*item) == NULL))
+    if((*item) == NULL)
     {
         *item = createEllipseItem(rect);
         return;
