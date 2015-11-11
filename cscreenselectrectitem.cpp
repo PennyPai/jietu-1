@@ -16,7 +16,7 @@ CScreenSelectRectItem::CScreenSelectRectItem(const QPixmap &desktopPixmap, QGrap
     , m_rightMiddleEllipseItem(NULL)
     , m_movePointHidden(true)
     , m_desktopPixmap(desktopPixmap)
-    , m_penColor(QColor("#00ACFF"))
+    , m_penColor(QColor("#77d7ff"))
     , m_rect(0,0,0,0)
 {
     QBrush brush(m_desktopPixmap);

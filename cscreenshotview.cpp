@@ -52,6 +52,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     m_sx = 1.0 * geometry.width() / pixmap.width();
     m_sy = 1.0 * geometry.height() / pixmap.height();
     m_backgroundItem->setScale(m_sx);
+//    m_backgroundItem->unsetCursor();
     m_selectRectItem = new CScreenSelectRectItem(m_desktopPixmap);
     m_selectRectItem->setScale(m_sx);
     m_selectRectItem->setVisible(false);
@@ -81,6 +82,9 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     {
         updatePreviewItem(this->mapFromGlobal(pos));
     }
+    //=========
+    this->setCursor(Qt::IBeamCursor);
+
 }
 
 CScreenShotView::~CScreenShotView()
@@ -470,6 +474,7 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         }
     }
 
+    updateCursor(getPointToSelectedItem(event->pos()));
     return QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -726,6 +731,44 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
     {
         emit sigPreviewItemShow();
         m_previewItem->setVisible(true);
+    }
+}
+
+void CScreenShotView::updateCursor(const QPointF &pos)
+{
+    CScreenPositionType type = m_selectRectItem->getPostionType(pos);
+    Qt::CursorShape cursorShape = Qt::ArrowCursor;
+    switch (type)
+    {
+    case CSCREEN_POSITION_TYPE_TOP_LEFT:
+    case CSCREEN_POSITION_TYPE_BOTTOM_RIGHT:
+        cursorShape = Qt::SizeFDiagCursor;
+        break;
+    case CSCREEN_POSITION_TYPE_TOP_MIDDLE:
+    case CSCREEN_POSITION_TYPE_BOTTOM_MIDDLE:
+        cursorShape = Qt::SizeVerCursor;
+        break;
+    case CSCREEN_POSITION_TYPE_TOP_RIGHT:
+    case CSCREEN_POSITION_TYPE_BOTTOM_LEFT:
+        cursorShape = Qt::SizeBDiagCursor;
+        break;
+    case CSCREEN_POSITION_TYPE_LEFT_MIDDLE:
+    case CSCREEN_POSITION_TYPE_RIGHT_MIDDLE:
+        cursorShape = Qt::SizeHorCursor;
+        break;
+    default:
+        cursorShape = Qt::ArrowCursor;
+        break;
+    }
+    LOG_TEST(QString("move pos x %1,y %2,type %3,cursorShape %4")
+             .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
+//    if(QApplication::overrideCursor()->shape() != cursorShape)
+    {
+//        QApplication::setOverrideCursor(QCursor(Qt::SizeVerCursor));
+//        QApplication::restoreOverrideCursor();
+//        this->setAttribute(Qt::WA_WState_Created,false);
+//        this->setCursor(Qt::SizeVerCursor);
+        this->viewport()->setCursor(QCursor(Qt::SizeVerCursor));
     }
 }
 
