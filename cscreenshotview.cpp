@@ -52,7 +52,6 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     m_sx = 1.0 * geometry.width() / pixmap.width();
     m_sy = 1.0 * geometry.height() / pixmap.height();
     m_backgroundItem->setScale(m_sx);
-//    m_backgroundItem->unsetCursor();
     m_selectRectItem = new CScreenSelectRectItem(m_desktopPixmap);
     m_selectRectItem->setScale(m_sx);
     m_selectRectItem->setVisible(false);
@@ -82,9 +81,6 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     {
         updatePreviewItem(this->mapFromGlobal(pos));
     }
-    //=========
-    this->setCursor(Qt::IBeamCursor);
-
 }
 
 CScreenShotView::~CScreenShotView()
@@ -760,15 +756,12 @@ void CScreenShotView::updateCursor(const QPointF &pos)
         cursorShape = Qt::ArrowCursor;
         break;
     }
-    LOG_TEST(QString("move pos x %1,y %2,type %3,cursorShape %4")
-             .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
-//    if(QApplication::overrideCursor()->shape() != cursorShape)
+    if(this->cursor().shape() != cursorShape)
     {
-//        QApplication::setOverrideCursor(QCursor(Qt::SizeVerCursor));
-//        QApplication::restoreOverrideCursor();
-//        this->setAttribute(Qt::WA_WState_Created,false);
-//        this->setCursor(Qt::SizeVerCursor);
-        this->viewport()->setCursor(QCursor(Qt::SizeVerCursor));
+        this->setCursor(cursorShape);
+
+        LOG_TEST(QString("move pos x %1,y %2,type %3,cursorShape %4")
+                 .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
     }
 }
 

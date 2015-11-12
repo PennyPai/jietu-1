@@ -7,8 +7,6 @@
 #include <QWindowList>
 #include <QWindow>
 
-
-
 CScreenShotManager * CScreenShotManager::m_instance = NULL;
 
 CScreenShotManager::CScreenShotManager(QObject *parent)
@@ -28,7 +26,7 @@ CScreenShotManager *CScreenShotManager::getInstance()
 
 CScreenShotManager::~CScreenShotManager()
 {
-    //
+    clearAll();
 }
 
 void CScreenShotManager::startScreenShot()
