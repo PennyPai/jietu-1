@@ -884,6 +884,7 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
         if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
             setShotStatus(CSCREEN_SHOT_STATE_EDITED);
+            m_selectRectItem->setMovePointHidden(true);
         }
         break;
     case CSCREEN_BUTTON_TYPE_OK:
@@ -903,7 +904,7 @@ void CScreenShotView::onFinishTimerOut()
     QPointF startPos = m_selectRectItem->getSelectRect().topLeft();
     QPointF endPos = m_selectRectItem->getSelectRect().bottomRight();
     QRect rect = getPositiveRect(startPos,endPos).toRect();
-    if(rect.width() > 1)
+    if(rect.width() >= 1 && rect.height() >= 1)
     {
         m_isValid = true;
         m_pixmap = createPixmap(rect);
@@ -914,5 +915,8 @@ void CScreenShotView::onFinishTimerOut()
     {
         m_isValid = false;
     }
+    LOG_TEST(QString("shot is %1valid,pixmap is %2null")
+             .arg(m_isValid?"":"not")
+             .arg(m_pixmap.isNull()?"":"not "));
     setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
 }

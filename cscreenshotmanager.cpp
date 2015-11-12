@@ -133,9 +133,18 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             m_viewList.clear();
 #endif
         }
-        if(status == CSCREEN_SHOT_STATE_FINISHED && !pixmap.isNull() && isValid)
+        if(status == CSCREEN_SHOT_STATE_FINISHED)
         {
-            emit sigScreenShotPixmapChanged(pixmap);
+            if(!pixmap.isNull() && isValid)
+            {
+                emit sigScreenShotPixmapChanged(pixmap);
+            }
+            else
+            {
+                LOG_WARNING(QString("shot is %1valid,pixmap is %2null")
+                         .arg(isValid?"":"not")
+                         .arg(pixmap.isNull()?"":"not "));
+            }
         }
         m_isRunning = false;
     }
