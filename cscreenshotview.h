@@ -56,6 +56,7 @@ private:
     
     QRect getMouseOnWindowRect(const QPoint &pos);
     int getRectDistance(const QRect &rect, const QPoint &pos);
+    void adjustRectSize(const QRect &parentRect,QRect &rect);
 
 private slots:
     void onButtonClicked(CScreenButtonType type);

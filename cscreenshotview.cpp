@@ -203,6 +203,12 @@ QRect CScreenShotView::getMouseOnWindowRect(const QPoint &pos)
             }
         }
     }
+    //调整大小，保证在当前屏幕内====================
+    if(m_desktopScreen)
+    {
+        QRect deskRect = m_desktopScreen->geometry();
+        adjustRectSize(deskRect,rect);
+    }
     return rect;
 }
 
@@ -218,6 +224,23 @@ int CScreenShotView::getRectDistance(const QRect &rect, const QPoint &pos)
     distance += qAbs(pos.y() - rect.top());
     distance += qAbs(pos.y() - rect.bottom());
     return distance;
+}
+
+void CScreenShotView::adjustRectSize(const QRect &parentRect, QRect &rect)
+{
+    if(parentRect.right() < rect.left()
+            || parentRect.bottom() < rect.top()
+            ||  parentRect.left() > rect.right()
+            || parentRect.top() > rect.bottom())
+    {
+        rect = QRect();
+        return;
+    }
+    rect.setX(qMax(parentRect.x(),rect.x()));
+    rect.setY(qMax(parentRect.y(),rect.y()));
+    rect.setBottom(qMin(parentRect.bottom(),rect.bottom()));
+    rect.setRight(qMin(parentRect.right(),rect.right()));
+    return;
 }
 
 bool CScreenShotView::event(QEvent *event)
