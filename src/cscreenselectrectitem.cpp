@@ -1,6 +1,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 #include "cscreenselectrectitem.h"
 #include "cscreenpublic.h"
 
@@ -39,6 +40,8 @@ void CScreenSelectRectItem::setSelectedRect(const QRectF &rect)
                      m_rect.height() + 2 * penWidth);
     QGraphicsRectItem::setRect(adjustRect);
     updateEllipseItems();
+    prepareGeometryChange();
+    update();
 }
 
 void CScreenSelectRectItem::setScale(qreal scale)
@@ -52,7 +55,7 @@ void CScreenSelectRectItem::setScale(qreal scale)
         return;
     }
     QPen pen(m_penColor);
-    pen.setWidth(m_penWidth / scale);
+    pen.setWidthF(m_penWidth / scale);
     this->setPen(pen);
     QGraphicsRectItem::setScale(scale);
     setSelectedRect(m_rect);
@@ -176,6 +179,23 @@ CScreenPositionType CScreenSelectRectItem::getPostionType(const QPointF &pos)
         return CSCREEN_POSITION_TYPE_CONTAIN;
     }
     return CSCREEN_POSITION_TYPE_NOT_CONTAIN;
+}
+
+void CScreenSelectRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    qreal penHalfWidth = this->pen().widthF() / 2;
+    QRect imageRect(m_rect.x(),
+                     m_rect.y() - penHalfWidth,
+                     m_rect.width() + 2 * penHalfWidth,
+                     m_rect.height() + 2 * penHalfWidth);
+    QPixmap pixmap = m_desktopPixmap.copy(m_rect.toRect());
+    painter->drawImage(m_rect,pixmap.toImage());
+    QRect rect = m_rect.toRect();
+    QRectF borderRect(rect.x() - penHalfWidth,rect.y() - penHalfWidth,
+            rect.width() + 2 * penHalfWidth,
+            rect.height() + 2 * penHalfWidth);
+    painter->setPen(this->pen());
+    painter->drawRect(borderRect);
 }
 
 void CScreenSelectRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
