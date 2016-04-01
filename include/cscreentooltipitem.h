@@ -2,12 +2,11 @@
 #define _CSCREENTOOLTIPITEM_H_
 
 #include <QGraphicsObject>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
-class CScreenTooltipItem : public QGraphicsObject
+class CSCREENSHOTSHARED_EXPORT CScreenTooltipItem : public QGraphicsObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenTooltipItem(QGraphicsItem *parent = 0);

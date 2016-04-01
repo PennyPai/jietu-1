@@ -1,12 +1,11 @@
 #ifndef _CSCREENEDITORBUTTONITEM_H_
 #define _CSCREENEDITORBUTTONITEM_H_
 #include <QGraphicsObject>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
-class CScreenEditorButtonItem : public QGraphicsObject
+class CSCREENSHOTSHARED_EXPORT CScreenEditorButtonItem : public QGraphicsObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenEditorButtonItem(const QImage &imageNormal,const QImage &imagePressed,const QRectF &rect,QGraphicsItem *parent = 0);

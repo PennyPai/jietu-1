@@ -2,12 +2,11 @@
 #define _CSCREENSHOTSCENE_H_
 
 #include <QGraphicsScene>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
-class CScreenShotScene : public QGraphicsScene
+class CSCREENSHOTSHARED_EXPORT CScreenShotScene : public QGraphicsScene
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenShotScene(QObject *parent = 0);

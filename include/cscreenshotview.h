@@ -5,7 +5,6 @@
 
 #include "cscreenpublic.h"
 #include "cscreeneditortoolbaritem.h"
-#include "clogsetting.h"
 
 class CScreenShotScene;
 class CScreenSelectRectItem;
@@ -14,10 +13,9 @@ class CScreenEditorToolbarItem;
 class CScreenRectItem;
 class CScreenTooltipItem;
 
-class CScreenShotView : public QGraphicsView
+class CSCREENSHOTSHARED_EXPORT CScreenShotView : public QGraphicsView
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenShotView(const QList<QRect> &rectList,QScreen *screen,QWidget *parent = 0);

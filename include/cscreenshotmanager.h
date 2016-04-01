@@ -4,14 +4,13 @@
 #include <QObject>
 #include <QSharedPointer>
 #include "cscreenpublic.h"
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
-class CScreenShotView;
+class CSCREENSHOTSHARED_EXPORT CScreenShotView;
 
 class CScreenShotManager : public QObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     static CScreenShotManager *getInstance();

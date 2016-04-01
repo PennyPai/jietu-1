@@ -3,6 +3,7 @@
 
 #include <QRect>
 #include <QList>
+#include "cscreenshot_global.h"
 
 #define C_SCREEN_ZERO  0.000000001
 
@@ -45,7 +46,7 @@ enum CScreenArrowDirection
 };
 
 // 获取窗口矩形列表
-QList<QRect> getWindownRectList();
+extern QList<QRect> CSCREENSHOTSHARED_EXPORT getWindownRectList();
 
 #endif // _CSCREENPUBLIC_H_
 

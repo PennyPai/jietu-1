@@ -3,15 +3,14 @@
 
 #include <QGraphicsObject>
 #include "cscreenpublic.h"
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
 class CScreenEditorButtonItem;
 class CScreenAttributeToolbarItem;
 
-class CScreenEditorToolbarItem : public QGraphicsObject
+class CSCREENSHOTSHARED_EXPORT CScreenEditorToolbarItem : public QGraphicsObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenEditorToolbarItem(QGraphicsItem *parent = 0);

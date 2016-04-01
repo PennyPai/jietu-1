@@ -2,10 +2,10 @@
 #define _CSCREENSELECTRECTITEM_H_
 
 #include <QGraphicsRectItem>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 #include "cscreenpublic.h"
 
-class CScreenSelectRectItem : public QGraphicsRectItem
+class CSCREENSHOTSHARED_EXPORT CScreenSelectRectItem : public QGraphicsRectItem
 {
 public:
     CScreenSelectRectItem(const QPixmap &desktopPixmap,QGraphicsItem * parent = 0);

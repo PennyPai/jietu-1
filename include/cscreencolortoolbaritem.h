@@ -2,15 +2,14 @@
 #define _CSCREENCOLORTOOLBARITEM_H_
 
 #include <QGraphicsObject>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 #include "cscreenpublic.h"
 
 class CScreenEditorButtonItem;
 
-class CScreenColorToolbarItem : public QGraphicsObject
+class CSCREENSHOTSHARED_EXPORT CScreenColorToolbarItem : public QGraphicsObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenColorToolbarItem(QGraphicsItem *parent = 0);

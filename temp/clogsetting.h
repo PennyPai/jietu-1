@@ -2,6 +2,7 @@
 #define _CLOGSETTING_H_
 #include <QDebug>
 #include <QTime>
+#include "ctestfunction.h"
 
 #define LOG4QT_DECLARE_QCLASS_LOGGER
 
@@ -22,6 +23,7 @@
 #define LOG_WARNING_ROOT(warnLog) qWarning() << LOG_HEAD << "[WARN]" << warnLog;
 #define LOG_ERROR_ROOT(errorLog) qCritical() << LOG_HEAD << errorLog;
 
+#define LOG_FUNCTION CTestFunction(QString("[Line:%1][%2]").arg(QString::number(__LINE__)).arg(Q_FUNC_INFO))
 
 #endif // _CLOGSETTING_H_
 

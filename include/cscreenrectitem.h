@@ -1,12 +1,11 @@
 #ifndef _CSCREENRECTITEM_H_
 #define _CSCREENRECTITEM_H_
 #include <QGraphicsObject>
-#include "clogsetting.h"
+#include "cscreenshot_global.h"
 
-class CScreenRectItem : public QGraphicsObject
+class CSCREENSHOTSHARED_EXPORT CScreenRectItem : public QGraphicsObject
 {
     Q_OBJECT
-    LOG4QT_DECLARE_QCLASS_LOGGER
 
 public:
     CScreenRectItem(const QRectF &rect,const QRectF &painterRect,QGraphicsItem *parent = 0);

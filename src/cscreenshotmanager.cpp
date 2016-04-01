@@ -39,7 +39,7 @@ void CScreenShotManager::startScreenShot()
     QList<QScreen *> screens = QApplication::screens();
     int index = 0;
     QList<QRect> rectList = getWindownRectList();
-    LOG_TEST(QString("all rect count %1").arg(rectList.count()));
+    C_SCREENSHOTSHARED_LOG(QString("all rect count %1").arg(rectList.count()));
 
     foreach (QScreen *d, screens)
     {
@@ -73,7 +73,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
     CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
     if(view == NULL)
     {
-        LOG_WARNING(QString("view is NULL"));
+        C_SCREENSHOTSHARED_LOG(QString("view is NULL"));
         return;
     }
     QPixmap pixmap;
@@ -141,7 +141,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             }
             else
             {
-                LOG_WARNING(QString("shot is %1valid,pixmap is %2null")
+                C_SCREENSHOTSHARED_LOG(QString("shot is %1valid,pixmap is %2null")
                          .arg(isValid?"":"not")
                          .arg(pixmap.isNull()?"":"not "));
             }
@@ -155,7 +155,7 @@ void CScreenShotManager::onPreviewItemShow()
     CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
     if(view == NULL)
     {
-        LOG_WARNING(QString("view is NULL"));
+        C_SCREENSHOTSHARED_LOG(QString("view is NULL"));
         return;
     }
     foreach (CScreenShotView *d, m_viewList)

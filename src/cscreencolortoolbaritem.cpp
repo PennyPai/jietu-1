@@ -98,7 +98,7 @@ void CScreenColorToolbarItem::onItemClicked()
     CScreenEditorButtonItem *buttonItem = dynamic_cast<CScreenEditorButtonItem*>(sender());
     if(buttonItem == NULL)
     {
-        LOG_WARNING(QString("buttonItem is NULL"));
+        C_SCREENSHOTSHARED_LOG(QString("buttonItem is NULL"));
         return;
     }
     if(m_colorItemMap.contains(buttonItem))

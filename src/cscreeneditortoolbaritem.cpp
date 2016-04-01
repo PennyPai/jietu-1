@@ -99,7 +99,7 @@ void CScreenEditorToolbarItem::updateAttributeToolbar(const qreal centerX)
     qreal veiwHeight = views.first()->height();
     qreal viewWidth = views.first()->width();
     QPointF maxPoint = this->mapFromScene(QPointF(viewWidth,veiwHeight));
-    LOG_TEST(QString("pos(%1,%2),viewWidth %3,veiwHeight %4,maxPoint(%5,%6)")
+    C_SCREENSHOTSHARED_LOG(QString("pos(%1,%2),viewWidth %3,veiwHeight %4,maxPoint(%5,%6)")
              .arg(this->pos().x()).arg(this->pos().y())
              .arg(viewWidth).arg(veiwHeight)
              .arg(maxPoint.x()).arg(maxPoint.y()));
@@ -136,7 +136,7 @@ void CScreenEditorToolbarItem::onButtonClicked()
     CScreenEditorButtonItem *buttonItem = dynamic_cast<CScreenEditorButtonItem*>(sender());
     if(buttonItem == NULL)
     {
-        LOG_WARNING(QString("buttonItem is NULL"));
+        C_SCREENSHOTSHARED_LOG(QString("buttonItem is NULL"));
         return;
     }
 
@@ -168,5 +168,5 @@ void CScreenEditorToolbarItem::onButtonClicked()
         m_okButtonItem->setSelected();
     }
     emit sigButtonClicked(m_currentButtonType);
-    LOG_TEST(QString("onButtonClicked"));
+    C_SCREENSHOTSHARED_LOG(QString("onButtonClicked"));
 }
