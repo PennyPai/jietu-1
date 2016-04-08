@@ -6,6 +6,7 @@
 QList<QRect> getWindownRectList()
 {
     QList<QRect> rectList;
+    return rectList;
 
     NSArray *screenArray = [NSScreen screens];
     NSScreen *mainScreen = [NSScreen mainScreen];
@@ -32,7 +33,7 @@ QList<QRect> getWindownRectList()
         CGRect bounds;
         CGRectMakeWithDictionaryRepresentation((CFDictionaryRef)[window objectForKey:@"kCGWindowBounds"], &bounds);
 //        NSLog(@"TTT %@: %@",name,NSStringFromRect(bounds));
-        NSLog(@"rect x = %0.0f,y = %0.0f,w = %0.0f:h = %0.0f",bounds.origin.x,bounds.origin.y,bounds.size.width,bounds.size.height);
+//        NSLog(@"rect x = %0.0f,y = %0.0f,w = %0.0f:h = %0.0f",bounds.origin.x,bounds.origin.y,bounds.size.width,bounds.size.height);
         QRect rect;
         rect.setX(bounds.origin.x);
         rect.setY(bounds.origin.y);
