@@ -12,10 +12,12 @@ QMAKE_LFLAGS += -framework AppKit
 OBJECTIVE_SOURCES += \
     ./src/cscreenpublic.mm
 }
-#win32 {
-#SOURCES += ./src/cscreenpublic.cpp
-#DLLDESTDIR +=../cscreenshot/lib/mac
-#}
+win32 {
+SOURCES += ./src/cscreenpublic.cpp
+DESTDIR = ../cscreenshot/lib/win
+#DLLDESTDIR +=../cscreenshot/lib/win
+        LIBS += -luser32
+}
 
 TARGET = cscreenshot
 TEMPLATE = lib

@@ -8,7 +8,7 @@
 
 class CSCREENSHOTSHARED_EXPORT CScreenShotView;
 
-class CScreenShotManager : public QObject
+class CSCREENSHOTSHARED_EXPORT CScreenShotManager : public QObject
 {
     Q_OBJECT
 

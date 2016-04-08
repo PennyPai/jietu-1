@@ -12,7 +12,12 @@ TARGET = cscreenshottest
 TEMPLATE = app
 
 INCLUDEPATH += ../../include
+mac {
 LIBS += -L../../lib/mac -lcscreenshot
+}
+win32 {
+LIBS += -L../../lib/win -lcscreenshot
+}
 
 SOURCES += main.cpp\
         widget.cpp
