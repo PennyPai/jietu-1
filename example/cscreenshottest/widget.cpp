@@ -10,6 +10,7 @@ Widget::Widget(QWidget *parent) :
     connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap)),
             this,SLOT(onScreenShotPixmapChanged(QPixmap)));
 //    ui->labelPixmap->setScaledContents(true);
+//    this->setAttribute(Qt::WA_QuitOnClose,false);
 }
 
 Widget::~Widget()

@@ -38,10 +38,10 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     QDesktopWidget *pDesktoWidget = QApplication::desktop();
     QRect geometry= screen->geometry();
     C_SCREENSHOTSHARED_LOG(QString("screen->geometry() (%1,%2,%3,%4)")
-             .arg(geometry.x())
-             .arg(geometry.y())
-             .arg(geometry.width())
-             .arg(geometry.height()));
+                           .arg(geometry.x())
+                           .arg(geometry.y())
+                           .arg(geometry.width())
+                           .arg(geometry.height()));
     QPixmap pixmap = screen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                         ,geometry.y(),geometry.width(),geometry.height());
     drawPixmap(pixmap);
@@ -97,7 +97,18 @@ CScreenShotView::~CScreenShotView()
 void CScreenShotView::startSCreenShot()
 {
     C_SCREENSHOTSHARED_LOG_FUNCTION;
+#ifdef Q_OS_MAC
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    this->setWindowFlags(Qt::WindowType_Mask);
+#else
     this->overrideWindowFlags(Qt::ToolTip);
+#endif
+
+#elif defined(Q_OS_WIN)
+    this->overrideWindowFlags(Qt::ToolTip);
+#endif
+
     this->showFullScreen();
 }
 
@@ -135,10 +146,10 @@ QPixmap CScreenShotView::createPixmap(const QRect &rect)
         QDesktopWidget *pDesktoWidget = QApplication::desktop();
         QRect geometry= m_desktopScreen->geometry();
         C_SCREENSHOTSHARED_LOG(QString("screen->geometry() (%1,%2,%3,%4)")
-                 .arg(geometry.x())
-                 .arg(geometry.y())
-                 .arg(geometry.width())
-                 .arg(geometry.height()));
+                               .arg(geometry.x())
+                               .arg(geometry.y())
+                               .arg(geometry.width())
+                               .arg(geometry.height()));
         QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
                                                             ,geometry.y(),geometry.width(),geometry.height());
         pixmap = desktopPixmap.copy(rect);
@@ -324,8 +335,8 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::LeftButton)
     {
         C_SCREENSHOTSHARED_LOG(QString("x %1,posX %2, xx%3").arg(this->geometry().x())
-                 .arg(event->pos().x())
-                 .arg(this->mapFromGlobal(event->pos()).x()));
+                               .arg(event->pos().x())
+                               .arg(this->mapFromGlobal(event->pos()).x()));
         QRectF toolBarItemRect(m_toolbarItem->pos(),m_toolbarItem->boundingRect().size());
         if(m_toolbarItem->isVisible() && toolBarItemRect.contains(event->pos()))
         {
@@ -787,7 +798,7 @@ void CScreenShotView::updateCursor(const QPointF &pos)
         this->setCursor(cursorShape);
 
         C_SCREENSHOTSHARED_LOG(QString("move pos x %1,y %2,type %3,cursorShape %4")
-                 .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
+                               .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
     }
 }
 
@@ -942,7 +953,7 @@ void CScreenShotView::onFinishTimerOut()
         m_isValid = false;
     }
     C_SCREENSHOTSHARED_LOG(QString("shot is %1valid,pixmap is %2null")
-             .arg(m_isValid?"":"not")
-             .arg(m_pixmap.isNull()?"":"not "));
+                           .arg(m_isValid?"":"not")
+                           .arg(m_pixmap.isNull()?"":"not "));
     setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
 }
