@@ -91,21 +91,10 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         {
             if(firstView != NULL)
             {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-                //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
-                //方式1
-                //                d->setWindowOpacity(0.01);
-                //                d->showMinimized();
-                //方式2
-                d->setVisible(false);
-                d->setWindowState((d->windowState() & ~Qt::WindowActive) | Qt::WindowMinimized);
-                //END=======================
-#endif
-
 #ifdef Q_OS_WIN
             firstView->setVisible(false);
 #else
-            firstView->deleteLater();
+            d->deleteLater();
 #endif
             }
             else
@@ -126,19 +115,13 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
     {
         if(firstView)
         {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-            //START 防止MAC dock栏隐藏,且必须当前主界面是最后关闭===
-           firstView->setWindowOpacity(0.01);
-           firstView->showMinimized();
-#endif
-
 #ifdef Q_OS_WIN
             firstView->setVisible(false);
 #else
             firstView->deleteLater();
-            m_viewList.clear();
 #endif
         }
+        m_viewList.clear();
         if(status == CSCREEN_SHOT_STATE_FINISHED)
         {
             if(!pixmap.isNull() && isValid)
