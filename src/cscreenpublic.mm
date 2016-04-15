@@ -6,28 +6,29 @@
 QList<QRect> getWindownRectList()
 {
     QList<QRect> rectList;
-    NSArray *screenArray = [NSScreen screens];
-    NSScreen *mainScreen = [NSScreen mainScreen];
-    unsigned screenCount = [screenArray count];
-    unsigned index  = 0;
-    NSLog(@"screenCount #%d", screenCount);
+    //以下注释代码为探索性，暂时保留
+//    NSArray *screenArray = [NSScreen screens];
+//    NSScreen *mainScreen = [NSScreen mainScreen];
+//    unsigned screenCount = [screenArray count];
+//    unsigned index  = 0;
+//    NSLog(@"screenCount #%d", screenCount);
 
-    for (index; index < screenCount; index++)
-    {
-      NSScreen *screen = [screenArray objectAtIndex: index];
-      NSRect screenRect = [screen visibleFrame];
-      screenRect = [screen convertRectToBacking: screenRect];
-      NSString *mString = ((mainScreen == screen) ? @"Main" : @"not-main");
+//    for (index; index < screenCount; index++)
+//    {
+//      NSScreen *screen = [screenArray objectAtIndex: index];
+//      NSRect screenRect = [screen visibleFrame];
+//      screenRect = [screen convertRectToBacking: screenRect];
+//      NSString *mString = ((mainScreen == screen) ? @"Main" : @"not-main");
 
-      NSLog(@"Screen #%d (%@) Frame: %@", index, mString, NSStringFromRect(screenRect));
-    }
-    int windowCount = [[[NSApplication sharedApplication] windows] count];
-    NSLog(@"windowCount #%d", windowCount);
+//      NSLog(@"Screen #%d (%@) Frame: %@", index, mString, NSStringFromRect(screenRect));
+//    }
+//    int windowCount = [[[NSApplication sharedApplication] windows] count];
+//    NSLog(@"windowCount #%d", windowCount);
 
     NSMutableArray *windows = (__bridge NSMutableArray *)CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
 
     for (NSDictionary *window in windows) {
-        NSString *name = [window objectForKey:@"kCGWindowName" ];
+//        NSString *name = [window objectForKey:@"kCGWindowName" ];
         CGRect bounds;
         CGRectMakeWithDictionaryRepresentation((CFDictionaryRef)[window objectForKey:@"kCGWindowBounds"], &bounds);
 //        NSLog(@"TTT %@: %@",name,NSStringFromRect(bounds));
