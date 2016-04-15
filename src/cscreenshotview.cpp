@@ -135,6 +135,10 @@ void CScreenShotView::setPreviewItemHidden(bool isHidden)
 {
     C_SCREENSHOTSHARED_LOG_FUNCTION;
     m_previewItem->setVisible(!isHidden);
+    if(m_selectRectItem->isVisible() && isHidden)
+    {
+        m_selectRectItem->setVisible(false);
+    }
 }
 
 QPixmap CScreenShotView::createPixmap(const QRect &rect)
@@ -496,8 +500,9 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         if(!m_isPressed && !m_windowRectList.isEmpty())
         {
             QRect rect = getMouseOnWindowRect(event->globalPos());
-            QPointF topLeft = getPointToSelectedItem(rect.topLeft());
-            QPointF bottomRight = getPointToSelectedItem(rect.bottomRight());
+            QPoint startPoint = m_desktopScreen->geometry().topLeft();
+            QPointF topLeft = getPointToSelectedItem(rect.topLeft() - startPoint);
+            QPointF bottomRight = getPointToSelectedItem(rect.bottomRight() - startPoint);
             QRectF selectRect(topLeft,bottomRight);
             if(selectRect.isValid())
             {

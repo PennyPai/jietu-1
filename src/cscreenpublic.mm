@@ -6,8 +6,6 @@
 QList<QRect> getWindownRectList()
 {
     QList<QRect> rectList;
-    return rectList;
-
     NSArray *screenArray = [NSScreen screens];
     NSScreen *mainScreen = [NSScreen mainScreen];
     unsigned screenCount = [screenArray count];
@@ -26,7 +24,7 @@ QList<QRect> getWindownRectList()
     int windowCount = [[[NSApplication sharedApplication] windows] count];
     NSLog(@"windowCount #%d", windowCount);
 
-    NSMutableArray *windows = (__bridge NSMutableArray *)CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements, kCGNullWindowID);
+    NSMutableArray *windows = (__bridge NSMutableArray *)CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
 
     for (NSDictionary *window in windows) {
         NSString *name = [window objectForKey:@"kCGWindowName" ];
